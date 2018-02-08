@@ -67,7 +67,7 @@ import ubic.erminej.data.GeneSetTerms;
  */
 public class ErmineJCli {
 
-    private static final String FOOTER = "ermineJ, Copyright (c) 2006-2018 University of British Columbia.\nFor more help go to ermineJ.chibi.ubc.ca";
+    private static final String FOOTER = "ermineJ, Copyright (c) 2006-2018 University of British Columbia.\nFor more help go to http://erminej.msl.ubc.ca/";
     private static final String HEADER = "Options:";
 
     private static Log log = LogFactory.getLog( ErmineJCli.class );

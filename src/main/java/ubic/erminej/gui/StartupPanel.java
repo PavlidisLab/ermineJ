@@ -1,21 +1,21 @@
- /*
- * The ermineJ project
- *
- * Copyright (c) 2011 University of British Columbia
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *       http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
+/*
+* The ermineJ project
+*
+* Copyright (c) 2011 University of British Columbia
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+*       http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*
+*/
 
 package ubic.erminej.gui;
 
@@ -79,8 +79,8 @@ public class StartupPanel extends JPanel {
     private static final String GO_ARCHIVE_DIR = "http://archive.geneontology.org/latest-termdb";
 
     private static final String INSTRUCTIONS = "<html>For annotation files, visit "
-            + "<a href=\"http://www.chibi.ubc.ca/Gemma/showAllArrayDesigns.html/\">http://www.chibi.ubc.ca/Gemma/showAllArrayDesigns.html</a><br/> or"
-            + " <a href=\"http://www.chibi.ubc.ca/microannots/\">http://www.chibi.ubc.ca/microannots/</a></html>.";
+            + "<a href=\"http://www.msl.ubc.ca/Gemma/showAllArrayDesigns.html/\">http://www.msl.ubc.ca/Gemma/showAllArrayDesigns.html</a><br/> or"
+            + " <a href=\"http://www.msl.ubc.ca/microannots/\">http://www.msl.ubc.ca/microannots/</a></html>.";
 
     private static Log log = LogFactory.getLog( StartupPanel.class );
     private static final String DEFAULT_GO_TERM_FILE_NAME = "go_daily-termdb.rdf-xml.gz";
@@ -116,7 +116,7 @@ public class StartupPanel extends JPanel {
 
     private JTextField annotFileTextField = new JTextField();
 
-    private JComboBox<String> annotFormat = new JComboBox<>();
+    //  private JComboBox<String> annotFormat = new JComboBox<>();
 
     private JTextField projectFileTextField = new JTextField();
 
@@ -503,21 +503,21 @@ public class StartupPanel extends JPanel {
         this.annotFileTextField = GuiUtil.fileBrowsePanel( annotPanel, new AnnotFilePickListener( this ) );
 
         // / configure drop-down for picking the annotation file format.
-        JLabel annotFileFormatLabel = new JLabel();
-        annotFileFormatLabel.setText( "Annotation file format" );
-        annotFileFormatLabel.setLabelFor( annotFormat );
-        annotFormat.setEditable( false );
-        annotFormat.addItem( "ErmineJ" );
-        annotFormat.addItem( "Affy CSV" );
-        annotFormat.addItem( "Agilent" );
-        annotFormat.setMaximumSize( new Dimension( 200, 25 ) );
-        if ( settings.getAnnotFormat() == Format.AFFYCSV ) {
-            annotFormat.setSelectedItem( "Affy CSV" );
-        } else if ( settings.getAnnotFormat() == Format.AGILENT ) {
-            annotFormat.setSelectedItem( "Agilent" );
-        } else {
-            annotFormat.setSelectedItem( "ErmineJ" );
-        }
+        // JLabel annotFileFormatLabel = new JLabel();
+        // annotFileFormatLabel.setText( "Annotation file format" );
+        //annotFileFormatLabel.setLabelFor( annotFormat );
+        // annotFormat.setEditable( false );
+        // annotFormat.addItem( "ErmineJ" );
+        //   annotFormat.addItem( "Affy CSV" );
+        //  annotFormat.addItem( "Agilent" );
+        //  annotFormat.setMaximumSize( new Dimension( 200, 25 ) );
+        // if ( settings.getAnnotFormat() == Format.AFFYCSV ) {
+        //     annotFormat.setSelectedItem( "Affy CSV" );
+        // } else if ( settings.getAnnotFormat() == Format.AGILENT ) {
+        //     annotFormat.setSelectedItem( "Agilent" );
+        // } else {
+        //     annotFormat.setSelectedItem( "ErmineJ" );
+        // }
 
         locateAnnotsButton = new JButton( "Get from Gemma" );
         locateAnnotsButton.addActionListener( new ActionListener() {
@@ -527,29 +527,27 @@ public class StartupPanel extends JPanel {
             }
         } );
 
-        annotFormat.addActionListener( new ActionListener() {
-            @Override
-            public void actionPerformed( ActionEvent e ) {
-                String formatS = ( String ) annotFormat.getSelectedItem();
-                if ( formatS.equals( "ErmineJ" ) ) {
-                    locateAnnotsButton.setEnabled( true );
-                } else if ( formatS.equals( "Affy CSV" ) ) {
-                    locateAnnotsButton.setEnabled( false );
-                } else {
-                    locateAnnotsButton.setEnabled( false );
-                }
-            }
-        } );
+        //        annotFormat.addActionListener( new ActionListener() {
+        //            @Override
+        //            public void actionPerformed( ActionEvent e ) {
+        //                String formatS = ( String ) annotFormat.getSelectedItem();
+        //                if ( formatS.equals( "ErmineJ" ) ) {
+        //                    locateAnnotsButton.setEnabled( true );
+        //                } else if ( formatS.equals( "Affy CSV" ) ) {
+        //                    locateAnnotsButton.setEnabled( false );
+        //                } else {
+        //                    locateAnnotsButton.setEnabled( false );
+        //                }
+        //            }
+        //        } );
 
         JPanel formatPanel = new JPanel();
         GroupLayout fpL = new GroupLayout( formatPanel );
         formatPanel.setLayout( fpL );
         fpL.setAutoCreateContainerGaps( true );
         fpL.setAutoCreateGaps( true );
-        fpL.setHorizontalGroup( fpL.createSequentialGroup().addComponent( annotFileFormatLabel )
-                .addComponent( annotFormat ).addComponent( locateAnnotsButton ) );
-        fpL.setVerticalGroup( fpL.createParallelGroup( GroupLayout.Alignment.BASELINE )
-                .addComponent( annotFileFormatLabel ).addComponent( annotFormat ).addComponent( locateAnnotsButton ) );
+        fpL.setHorizontalGroup( fpL.createSequentialGroup().addComponent( locateAnnotsButton ) );
+        fpL.setVerticalGroup( fpL.createParallelGroup( GroupLayout.Alignment.BASELINE ).addComponent( locateAnnotsButton ) );
 
         GroupLayout apL = new GroupLayout( annotPanel );
         annotPanel.setLayout( apL );
@@ -614,15 +612,15 @@ public class StartupPanel extends JPanel {
     private void saveSettings() {
         settings.setClassFile( classFileTextField.getText() );
         settings.setAnnotFile( annotFileTextField.getText() );
-        String formatS = ( String ) annotFormat.getSelectedItem();
-
-        if ( formatS.equals( "ErmineJ" ) ) {
+//        String formatS = ( String ) annotFormat.getSelectedItem();
+//
+//        if ( formatS.equals( "ErmineJ" ) ) {
             settings.setAnnotFormat( Format.DEFAULT );
-        } else if ( formatS.equals( "Affy CSV" ) ) {
-            settings.setAnnotFormat( Format.AFFYCSV );
-        } else {
-            settings.setAnnotFormat( Format.AGILENT );
-        }
+        //        } else if ( formatS.equals( "Affy CSV" ) ) {
+        //            settings.setAnnotFormat( Format.AFFYCSV );
+        //        } else {
+        //            settings.setAnnotFormat( Format.AGILENT );
+        //        }
     }
 
     private void setValues() {
@@ -648,14 +646,14 @@ public class StartupPanel extends JPanel {
             settings.setDataDirectory( System.getProperty( "user.dir" ) );
         }
 
-        String formatS = ( String ) annotFormat.getSelectedItem();
-        if ( formatS.equals( "ErmineJ" ) ) {
-            locateAnnotsButton.setEnabled( true );
-        } else if ( formatS.equals( "Affy CSV" ) ) {
-            locateAnnotsButton.setEnabled( false );
-        } else {
-            locateAnnotsButton.setEnabled( false );
-        }
+        //        String formatS = ( String ) annotFormat.getSelectedItem();
+        //        if ( formatS.equals( "ErmineJ" ) ) {
+        locateAnnotsButton.setEnabled( true );
+        //        } else if ( formatS.equals( "Affy CSV" ) ) {
+        //            locateAnnotsButton.setEnabled( false );
+        //        } else {
+        //            locateAnnotsButton.setEnabled( false );
+        //        }
     }
 
 }

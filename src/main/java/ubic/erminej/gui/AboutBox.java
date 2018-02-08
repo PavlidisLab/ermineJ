@@ -54,7 +54,7 @@ public class AboutBox extends JDialog {
 
     private final static String COPYRIGHT = "<html>Copyright &copy; University of British Columbia</html>";
     private static final String SOFTWARENAME = "ermineJ";
-    private static String homepageURL = "http://erminej.chibi.ubc.ca/";
+    private static String homepageURL = "http://erminej.msl.ubc.ca/";
 
     /**
      * <p>
@@ -132,7 +132,7 @@ public class AboutBox extends JDialog {
         licensePanel.setContentType( "text/html" );
         licensePanel
                 .setText( "<html><p>ErmineJ is licensed under the Apache 2 Public License.</p><p>Direct questions to "
-                        + "erminej@chibi.ubc.ca</p><p>If you use this software for your work, please cite:<br/> "
+                        + "erminej@msl.ubc.ca</p><p>If you use this software for your work, please cite:<br/> "
 
                         + "Gillis J, Mistry M, Pavlidis P. (2010)"
                         + " Gene function analysis in complex data sets using ErmineJ. Nature Protocols 5:1148-59"

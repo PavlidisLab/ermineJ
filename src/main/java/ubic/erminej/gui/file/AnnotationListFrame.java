@@ -73,7 +73,7 @@ public class AnnotationListFrame extends JDialog {
         this.arrays = new ArrayList<>();
 
         for ( ArrayDesignValueObject v : a ) {
-            if ( v.getHasAnnotationFile() ) this.arrays.add( v );
+            this.arrays.add( v );
         }
 
         // initially sort by short name.

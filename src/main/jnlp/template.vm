@@ -1,8 +1,8 @@
-<jnlp spec="$jnlpspec" codebase="http://www.chibi.ubc.ca/ermineJ/webstart" href="$outputFile">
+<jnlp spec="$jnlpspec" codebase="http://erminej.msl.ubc.ca/webstart" href="$outputFile">
 	<information>
 	<title>ErmineJ</title>
 	<vendor>$project.Organization.Name</vendor>
-	<homepage href="http://ermineJ.chibi.ubc.ca/"/>
+	<homepage href="http://erminej.msl.ubc.ca"/>
 	<description>ErmineJ gene set analysis</description>
 	<icon href="ermineJ.gif"/>
 #if($offlineAllowed) 

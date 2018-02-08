@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ermineJ</groupId>
 	<artifactId>ermineJ</artifactId>
@@ -20,8 +21,8 @@
 		<url>https://github.com/PavlidisLab/ermineJ</url>
 		<connection>scm:git:https://github.com/PavlidisLab/ermineJ.git</connection>
 		<developerConnection>scm:git:https://github.com/PavlidisLab/ermineJ.git</developerConnection>
-	  <tag>HEAD</tag>
-  </scm>
+		<tag>HEAD</tag>
+	</scm>
 	<issueManagement>
 		<system>GitHub</system>
 		<url>
@@ -166,7 +167,7 @@
 		<dependency>
 			<groupId>gemma</groupId>
 			<artifactId>gemma-core</artifactId>
-			<version>1.17.1</version>
+			<version>1.21.0</version>
 			<type>jar</type>
 			<exclusions>
 				<exclusion>
@@ -562,7 +563,6 @@
 						<link>http://dst.lbl.gov/ACSSoftware/colt/api/</link>
 						<link>http://commons.apache.org/proper/commons-collections/javadocs/api-release/</link>
 						<link>http://commons.apache.org/proper/commons-lang/javadocs/api-3.1</link>
-						<limk>http://chibi.ubc.ca/faculty/pavlidis/basecode/apidocs</limk>
 					</links>
 					<stylesheetfile>${basedir}/src/main/javadoc/stylesheet.css</stylesheetfile>
 				</configuration>

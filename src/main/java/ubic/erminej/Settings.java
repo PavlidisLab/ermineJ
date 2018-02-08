@@ -60,16 +60,13 @@ public class Settings extends SettingsHolder {
      * URLS for web services used by the software. Use String.format to replace the %s with the desired platform short
      * name.
      */
-    /** Constant <code>ANNOTATION_FILE_FETCH_RESTURL="http://www.chibi.ubc.ca/Gemma/rest/v2/p"{trunked}</code> */
-    public static final String ANNOTATION_FILE_FETCH_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/v2/platforms/%s/annotations";
+    public static final String ANNOTATION_FILE_FETCH_RESTURL = "https://gemma.msl.ubc.ca/rest/v2/platforms/%s/annotations";
 
     // public static final String ANNOTATION_FILE_FETCH_RESTURL =
     // "http://localhost:8080/Gemma/rest/v2/platforms/?offset=0&limit=100000";
-    /** Constant <code>ANNOTATION_FILE_LIST_RESTURL="http://www.chibi.ubc.ca/Gemma/rest/v2/p"{trunked}</code> */
-    public static final String ANNOTATION_FILE_LIST_RESTURL = "http://www.chibi.ubc.ca/Gemma/rest/v2/platforms/?offset=0&limit=100000";
+    public static final String ANNOTATION_FILE_LIST_RESTURL = "https://gemma.msl.ubc.ca/rest/v2/platforms/?offset=0&limit=100000";
 
-    /** Constant <code>HELPURL="http://erminej.chibi.ubc.ca/help"</code> */
-    public static final String HELPURL = "http://erminej.chibi.ubc.ca/help";
+    public static final String HELPURL = "http://erminej.msl.ubc.ca/help";
 
     /**
      * Settings that we need to write to analysis results files. Other settings are not needed there (like window sizes,
@@ -88,7 +85,7 @@ public class Settings extends SettingsHolder {
      * Header for the config file.
      */
     protected static final String HEADER = "Configuration file for ermineJ."
-            + "Do not delete this file if you want your ermineJ settings to stay across sessions.\nFor more information see http://www.chibi.ubc.ca/ermineJ/";
+            + "Do not delete this file if you want your ermineJ settings to stay across sessions.\nFor more information see http://erminej.msl.ubc.ca/";
 
     /**
      * Part of the distribution, where defaults can be read from. If it is absent, hard-coded defaults are used.
