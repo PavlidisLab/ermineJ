@@ -73,8 +73,7 @@ public class SettingsHolder {
     /** Constant <code>defaults</code> */
     public static Map<String, Object> defaults = new HashMap<>();
 
-    /** Constant <code>GEMMA_URL_BASE="http://gemma.chibi.ubc.ca/"</code> */
-    public static final String GEMMA_URL_BASE = "http://gemma.chibi.ubc.ca/";
+    public static final String GEMMA_URL_BASE = "https://gemma.msl.ubc.ca/";
 
     /** Constant <code>GENE_URL_BASE="gene.url.base"</code> */
     public static final String GENE_URL_BASE = "gene.url.base";

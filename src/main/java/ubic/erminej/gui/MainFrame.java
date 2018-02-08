@@ -1642,7 +1642,7 @@ public class MainFrame extends JFrame {
             public void actionPerformed( ActionEvent e ) {
                 try {
                     /*
-                     * FIXME make this easier... and can point to Gemma.
+                     * FIXME make this a msl domain.
                      */
                     BrowserLauncher.openURL( "http://www.chibi.ubc.ca/microannots" );
                 } catch ( Exception ex ) {

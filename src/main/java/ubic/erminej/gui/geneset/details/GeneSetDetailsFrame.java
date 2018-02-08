@@ -139,8 +139,7 @@ public class GeneSetDetailsFrame extends JFrame {
 
     /** Constant <code>MAX_GENES_FOR_DETAIL_VIEWING=1000</code> */
     public static final int MAX_GENES_FOR_DETAIL_VIEWING = 1000;
-    /** Constant <code>GEMMA_GENE_SEARCH_URL_BASE="http://www.chibi.ubc.ca/Gemma/searcher."{trunked}</code> */
-    protected static final String GEMMA_GENE_SEARCH_URL_BASE = "http://www.chibi.ubc.ca/Gemma/searcher.html?scope=G&query=";
+    protected static final String GEMMA_GENE_SEARCH_URL_BASE = "https://gemma.msl.ubc.ca/searcher.html?scope=G&query=";
 
     private int width;
     private int height;

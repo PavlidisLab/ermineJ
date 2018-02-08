@@ -3,9 +3,9 @@
 		<appname>ErmineJ</appname>
 		<appversion>3.0</appversion>
 		<authors>
-			<author email="ermineJ@chibi.ubc.ca" name="Pavlidis Laboratory, UBC" />
+			<author email="ermineJ@msl.ubc.ca" name="Pavlidis Laboratory, UBC" />
 		</authors>
-		<url>http://www.chibi.ubc.ca/ermineJ</url>
+		<url>http://erminej.msl.ubc.ca/</url>
 		<uninstaller name="Uninstaller.jar" write="yes" />
 		<requiresjdk>no</requiresjdk>
 		<writeinstallationinformation>no</writeinstallationinformation>
