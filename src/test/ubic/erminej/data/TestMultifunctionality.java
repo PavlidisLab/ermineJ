@@ -27,17 +27,19 @@ import java.util.zip.ZipInputStream;
 import org.junit.Test;
 
 import ubic.erminej.Settings;
-import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.GeneAnnotationParser.Format;
 
 /**
  * @author paul
- * @version $Id$
  */
 public class TestMultifunctionality {
 
     @Test
     public void testMf1() throws Exception {
+        Settings settings = new Settings(); // assumed: log = true.
+        settings.setLoadUserDefined( false );
+        settings.setMaxClassSize( 100 );
+        settings.setMinClassSize( 10 );
 
         /*
          * JG was provided with this file for cross-checking.
@@ -55,9 +57,6 @@ public class TestMultifunctionality {
         assertNotNull( geneSets.getGraph().getRoot() );
 
         GeneAnnotationParser p = new GeneAnnotationParser( geneSets );
-
-        SettingsHolder settings = new Settings(); // assumed: log = true.
-        settings.setLoadUserDefined( false );
 
         GeneAnnotations ga = p.read( is, Format.DEFAULT, settings );
 
