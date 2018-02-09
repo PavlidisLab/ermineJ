@@ -67,7 +67,7 @@ public class ClassScoreSimple {
             throw new RuntimeException( e );
         }
         settings.setQuantile( 50 );
-        settings.setMtc( SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG );
+        settings.setMtc( SettingsHolder.MultiTestCorrMethod.FDR );
 
     }
 

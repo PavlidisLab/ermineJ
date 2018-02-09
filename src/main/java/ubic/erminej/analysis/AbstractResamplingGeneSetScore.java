@@ -21,6 +21,8 @@ package ubic.erminej.analysis;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import ubic.erminej.Settings;
+import ubic.erminej.SettingsHolder;
 import ubic.erminej.data.Histogram;
 
 /**
@@ -55,12 +57,13 @@ public abstract class AbstractResamplingGeneSetScore extends AbstractLongTask im
     protected boolean useSpeedUp = true;
     protected boolean useNormalApprox = true;
 
-    protected int classMaxSize = 100;
+    protected int classMaxSize = 200;
+    protected int classMinSize = 2;
+
     protected int numRuns = 10000;
     protected int numClasses = 0;
     protected double histogramMax = 0;
     protected double histogramMin = 0;
-    protected int classMinSize = 2;
     protected Histogram hist = null;
 
     /**
@@ -72,17 +75,6 @@ public abstract class AbstractResamplingGeneSetScore extends AbstractLongTask im
      */
     public Histogram getHist() {
         return hist;
-    }
-
-    /**
-     * <p>
-     * Setter for the field <code>classMaxSize</code>.
-     * </p>
-     *
-     * @param value int
-     */
-    public void setClassMaxSize( int value ) {
-        classMaxSize = value;
     }
 
     /**

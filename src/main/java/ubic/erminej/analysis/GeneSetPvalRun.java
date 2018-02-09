@@ -491,9 +491,9 @@ public class GeneSetPvalRun {
                 messenger );
 
         Settings.MultiTestCorrMethod multipleTestCorrMethod = settings.getMtc();
-        if ( multipleTestCorrMethod == SettingsHolder.MultiTestCorrMethod.BONFERONNI ) {
+        if ( multipleTestCorrMethod == SettingsHolder.MultiTestCorrMethod.FWE ) {
             mt.bonferroni();
-        } else if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG ) ) {
+        } else if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.FDR ) ) {
             mt.benjaminihochberg();
             //        } else if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.WESTFALLYOUNG ) ) {
             //            if ( !( settings.getClassScoreMethod().equals( SettingsHolder.Method.GSR ) ) )

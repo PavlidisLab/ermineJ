@@ -67,7 +67,7 @@ public class SettingsHolder {
      * How to correct for multiple tests.
      */
     public enum MultiTestCorrMethod {
-        BENJAMINIHOCHBERG, BONFERONNI, WESTFALLYOUNG
+        FDR, FWE
     }
 
     /** Constant <code>defaults</code> */
@@ -189,8 +189,8 @@ public class SettingsHolder {
      */
     static {
         defaults.put( QUANTILE_CONFIG_NAME, 50 );
-        defaults.put( MIN_CLASS_SIZE, 10 );
-        defaults.put( MAX_CLASS_SIZE, 100 );
+        defaults.put( MIN_CLASS_SIZE, 20 );
+        defaults.put( MAX_CLASS_SIZE, 200 );
         defaults.put( ITERATIONS, 1000 );
         defaults.put( GENE_SCORE_THRESHOLD_KEY, 0.001 );
         defaults.put( GENE_SET_RESAMPLING_SCORE_METHOD, GeneScoreMethod.MEAN.toString() );
@@ -206,7 +206,7 @@ public class SettingsHolder {
         defaults.put( USE_USER_DEFINED_GROUPS, Boolean.TRUE );
         defaults.put( USE_MULTIFUNCTIONALITY_CORRECTION, Boolean.TRUE );
         defaults.put( SAVE_ALL_GENES_IN_OUTPUT, Boolean.FALSE );
-        defaults.put( MTC_CONFIG_NAME, MultiTestCorrMethod.BENJAMINIHOCHBERG );
+        defaults.put( MTC_CONFIG_NAME, MultiTestCorrMethod.FDR );
         defaults.put( USE_MOL_FUNC, Boolean.TRUE );
         defaults.put( USE_CELL_COMP, Boolean.TRUE );
         defaults.put( USE_BIOL_PROC, Boolean.TRUE );
@@ -596,7 +596,7 @@ public class SettingsHolder {
      */
     public MultiTestCorrMethod getMtc() {
         return MultiTestCorrMethod.valueOf( config.getString( MTC_CONFIG_NAME,
-                MultiTestCorrMethod.BENJAMINIHOCHBERG.toString() ) );
+                MultiTestCorrMethod.FDR.toString() ) );
     }
 
     /**
