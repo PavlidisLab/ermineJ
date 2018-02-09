@@ -55,7 +55,7 @@
 		<dependency>
 			<groupId>baseCode</groupId>
 			<artifactId>baseCode</artifactId>
-			<version>1.0.21</version>
+			<version>1.0.23-SNAPSHOT</version>
 			<type>jar</type>
 			<exclusions>
 				<exclusion>
@@ -167,7 +167,7 @@
 		<dependency>
 			<groupId>gemma</groupId>
 			<artifactId>gemma-core</artifactId>
-			<version>1.21.0</version>
+			<version>1.22.1</version>
 			<type>jar</type>
 			<exclusions>
 				<exclusion>
@@ -401,7 +401,7 @@
 				<exclusion>
 					<groupId>junit</groupId>
 					<artifactId>junit</artifactId>
-				</exclusion>
+				</exclusion> 
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -597,11 +597,11 @@
 								<include name="commons-logging.jar" />
 								<include name="commons-math3.jar" />
 								<include name="gemma-core.jar" />
-								<include name="gemma-gsec.jar" />
 								<include name="mtj.jar" />
 								<include name="xercesImpl.jar" />
 								<include name="jfreechart.jar" />
 								<include name="jsontools-core.jar" />
+								<include name="gemma-gsec.jar" />
 								<include name="jcommon.jar" />
 								<include name="antlr.jar" />
 								<include name="log4j.jar" />

@@ -100,6 +100,8 @@ public class AnalysisTests {
     public void gsrTest() {
         s.setClassScoreMethod( Method.GSR );
         s.setGeneSetResamplingScoreMethod( GeneScoreMethod.MEAN );
+        s.setMaxClassSize( 100 );
+        s.setMinClassSize( 10 );
         Analyzer a = new Analyzer( s, new StatusStderr(), annotations );
         a.run();
         Collection<GeneSetPvalRun> results = a.getLatestResults();
@@ -119,7 +121,8 @@ public class AnalysisTests {
     public void preReTest() {
         s.setClassScoreMethod( Method.GSR );
         s.setGeneSetResamplingScoreMethod( GeneScoreMethod.PRECISIONRECALL );
-
+        s.setMaxClassSize( 100 );
+        s.setMinClassSize( 10 );
         Analyzer a = new Analyzer( s, new StatusStderr(), annotations );
         a.run();
         Collection<GeneSetPvalRun> results = a.getLatestResults();
