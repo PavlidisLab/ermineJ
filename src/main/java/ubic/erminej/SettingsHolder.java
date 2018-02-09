@@ -67,7 +67,7 @@ public class SettingsHolder {
      * How to correct for multiple tests.
      */
     public enum MultiTestCorrMethod {
-        BENJAMINIHOCHBERG, BONFERRONI
+        FDR, FWE
     }
 
     /** Constant <code>defaults</code> */
@@ -206,7 +206,7 @@ public class SettingsHolder {
         defaults.put( USE_USER_DEFINED_GROUPS, Boolean.TRUE );
         defaults.put( USE_MULTIFUNCTIONALITY_CORRECTION, Boolean.TRUE );
         defaults.put( SAVE_ALL_GENES_IN_OUTPUT, Boolean.FALSE );
-        defaults.put( MTC_CONFIG_NAME, MultiTestCorrMethod.BENJAMINIHOCHBERG );
+        defaults.put( MTC_CONFIG_NAME, MultiTestCorrMethod.FDR );
         defaults.put( USE_MOL_FUNC, Boolean.TRUE );
         defaults.put( USE_CELL_COMP, Boolean.TRUE );
         defaults.put( USE_BIOL_PROC, Boolean.TRUE );
@@ -596,7 +596,7 @@ public class SettingsHolder {
      */
     public MultiTestCorrMethod getMtc() {
         return MultiTestCorrMethod.valueOf( config.getString( MTC_CONFIG_NAME,
-                MultiTestCorrMethod.BENJAMINIHOCHBERG.toString() ) );
+                MultiTestCorrMethod.FDR.toString() ) );
     }
 
     /**

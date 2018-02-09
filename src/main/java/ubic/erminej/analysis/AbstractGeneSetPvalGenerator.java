@@ -218,9 +218,9 @@ public abstract class AbstractGeneSetPvalGenerator extends AbstractLongTask {
         MultipleTestCorrector mt = new MultipleTestCorrector( settings, sortedClasses, geneAnnots, null, results,
                 getMessenger() );
         Settings.MultiTestCorrMethod multipleTestCorrMethod = settings.getMtc();
-        if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.BONFERRONI ) ) {
+        if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.FWE ) ) {
             mt.bonferroni();
-        } else if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG ) ) {
+        } else if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.FDR ) ) {
             mt.benjaminihochberg();
         } else {
             throw new UnsupportedOperationException( multipleTestCorrMethod
