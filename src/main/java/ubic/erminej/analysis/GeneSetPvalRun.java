@@ -491,7 +491,7 @@ public class GeneSetPvalRun {
                 messenger );
 
         Settings.MultiTestCorrMethod multipleTestCorrMethod = settings.getMtc();
-        if ( multipleTestCorrMethod == SettingsHolder.MultiTestCorrMethod.BONFERONNI ) {
+        if ( multipleTestCorrMethod == SettingsHolder.MultiTestCorrMethod.BONFERRONI ) {
             mt.bonferroni();
         } else if ( multipleTestCorrMethod.equals( SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG ) ) {
             mt.benjaminihochberg();

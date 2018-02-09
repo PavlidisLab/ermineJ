@@ -601,8 +601,8 @@ public class ErmineJCli {
                 .hasArg();
         OptionBuilder
                 .withDescription(
-                        "Multiple test correction method: " + SettingsHolder.MultiTestCorrMethod.BONFERONNI
-                                + " = Bonferonni FWE, "
+                        "Multiple test correction method: " + SettingsHolder.MultiTestCorrMethod.BONFERRONI
+                                + " = Bonferroni FWE, "
                                 // + SettingsHolder.MultiTestCorrMethod.WESTFALLYOUNG
                                 //  + " = Westfall-Young (slow), "
                                 + SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG
@@ -867,11 +867,12 @@ public class ErmineJCli {
                 if ( mtc == 0 || mtc == 1 || mtc == 2 ) {
                     switch ( mtc ) {
                         case 0:
-                            settings.setMtc( SettingsHolder.MultiTestCorrMethod.BONFERONNI );
+                            settings.setMtc( SettingsHolder.MultiTestCorrMethod.BONFERRONI );
                             break;
                         case 1:
-                            settings.setMtc( SettingsHolder.MultiTestCorrMethod.WESTFALLYOUNG );
-                            break;
+                            throw new IllegalArgumentException( "Westfall-Young correction is no longer supported" );
+                            //                            settings.setMtc( SettingsHolder.MultiTestCorrMethod.WESTFALLYOUNG );
+                            //                            break;
                         case 2:
                             settings.setMtc( SettingsHolder.MultiTestCorrMethod.BENJAMINIHOCHBERG );
                             break;
@@ -881,15 +882,19 @@ public class ErmineJCli {
 
                     System.err
                             .println(
-                                    "Please consider switching to the new command line style for this option (BONFERONNI, WESTFALLYOUNG or BENJAMINIHOCHBERG)" );
+                                    "Please consider switching to the new command line style for this option (BONFERRONI or BENJAMINIHOCHBERG)" );
                 } else {
-                    throw new IllegalArgumentException();
+                    System.err.println( "Multiple test correction must be BONFERRONI or BENJAMINIHOCHBERG" );
+                    showHelp();
+                    return false;
                 }
             } catch ( NumberFormatException e ) {
                 MultiTestCorrMethod mtcmethod = SettingsHolder.MultiTestCorrMethod.valueOf( arg );
                 settings.setMtc( mtcmethod );
             } catch ( Exception e ) {
-                System.err.println( "Multiple test correction must be  BONFERONNI, WESTFALLYOUNG or BENJAMINIHOCHBERG" );
+                System.err.println( "Multiple test correction must be BONFERRONI or BENJAMINIHOCHBERG" );
+                showHelp();
+                return false;
             }
         }
 

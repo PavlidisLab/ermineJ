@@ -67,7 +67,7 @@ public class SettingsHolder {
      * How to correct for multiple tests.
      */
     public enum MultiTestCorrMethod {
-        BENJAMINIHOCHBERG, BONFERONNI, WESTFALLYOUNG
+        BENJAMINIHOCHBERG, BONFERRONI
     }
 
     /** Constant <code>defaults</code> */
@@ -189,8 +189,8 @@ public class SettingsHolder {
      */
     static {
         defaults.put( QUANTILE_CONFIG_NAME, 50 );
-        defaults.put( MIN_CLASS_SIZE, 10 );
-        defaults.put( MAX_CLASS_SIZE, 100 );
+        defaults.put( MIN_CLASS_SIZE, 20 );
+        defaults.put( MAX_CLASS_SIZE, 200 );
         defaults.put( ITERATIONS, 1000 );
         defaults.put( GENE_SCORE_THRESHOLD_KEY, 0.001 );
         defaults.put( GENE_SET_RESAMPLING_SCORE_METHOD, GeneScoreMethod.MEAN.toString() );
