@@ -5,7 +5,7 @@
 	<groupId>ermineJ</groupId>
 	<artifactId>ermineJ</artifactId>
 	<name>ermineJ</name>
-	<version>3.1-SNAPSHOT</version>
+	<version>3.1</version>
 	<organization>
 		<name>UBC Michael Smith Laboratories</name>
 		<url>http://www.msl.ubc.ca</url>
@@ -55,7 +55,7 @@
 		<dependency>
 			<groupId>baseCode</groupId>
 			<artifactId>baseCode</artifactId>
-			<version>1.0.23-SNAPSHOT</version>
+			<version>1.0.23</version>
 			<type>jar</type>
 			<exclusions>
 				<exclusion>
