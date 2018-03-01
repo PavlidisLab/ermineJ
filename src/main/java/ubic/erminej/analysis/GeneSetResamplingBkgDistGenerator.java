@@ -60,7 +60,7 @@ public class GeneSetResamplingBkgDistGenerator extends AbstractResamplingGeneSet
      */
     private static final int MIN_ITERATIONS_FOR_ESTIMATION = 5000;
     /**
-     * Scores for ALL the genes.
+     * Scores for ALL the genes, for resampling
      */
     private Double[] geneScores = null;
 

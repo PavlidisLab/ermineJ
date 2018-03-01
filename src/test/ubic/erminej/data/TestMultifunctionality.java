@@ -36,7 +36,8 @@ public class TestMultifunctionality {
 
     @Test
     public void testMf1() throws Exception {
-        Settings settings = new Settings(); // assumed: log = true.
+        Settings settings = new Settings();
+        settings.setDoLog( true );
         settings.setLoadUserDefined( false );
         settings.setMaxClassSize( 100 );
         settings.setMinClassSize( 10 );

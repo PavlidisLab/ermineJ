@@ -31,6 +31,7 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.configuration.builder.FileBasedConfigurationBuilder;
 
+import ubic.erminej.SettingsHolder.GeneScoreMethod;
 import ubic.erminej.data.GeneAnnotationParser.Format;
 
 /**
@@ -38,7 +39,6 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
  * basically a value object to use during analyses.
  *
  * @author paul
- * @version $Id: $Id
  */
 public class SettingsHolder {
 
@@ -196,7 +196,6 @@ public class SettingsHolder {
         defaults.put( GENE_SET_RESAMPLING_SCORE_METHOD, GeneScoreMethod.MEAN.toString() );
         defaults.put( SettingsHolder.GENE_URL_BASE, DEFAULT_GENE_URL_BASE );
         defaults.put( GENE_REP_TREATMENT, MultiElementHandling.MEAN.toString() );
-        defaults.put( FILTER_NONSPECIFIC, Boolean.TRUE );
         defaults.put( DO_LOG, Boolean.TRUE );
         defaults.put( CLASS_SCORE_METHOD, Settings.Method.ORA.toString() );
         defaults.put( DATA_DIRECTORY, getDefaultUserDataDirPath() );
@@ -204,7 +203,6 @@ public class SettingsHolder {
         defaults.put( ANNOT_FORMAT, Format.DEFAULT.toString() );
         defaults.put( BIG_IS_BETTER, Boolean.FALSE );
         defaults.put( USE_USER_DEFINED_GROUPS, Boolean.TRUE );
-        defaults.put( USE_MULTIFUNCTIONALITY_CORRECTION, Boolean.TRUE );
         defaults.put( SAVE_ALL_GENES_IN_OUTPUT, Boolean.FALSE );
         defaults.put( MTC_CONFIG_NAME, MultiTestCorrMethod.FDR );
         defaults.put( USE_MOL_FUNC, Boolean.TRUE );
@@ -868,32 +866,18 @@ public class SettingsHolder {
     }
 
     /**
-     * Determine whether we should be using the upper tails of our histograms. The "big is better" setting reflects the
-     * original gene scores, not the log-transformed scores. Therefore if we are taking the log, and the user indicates
-     * smaller values are better, then we do want to use the upper tail. If we're not taking the log, then we just
-     * directly interpret what the user selected for 'bigIsBetter'.
+     * Determine whether we should be using the upper tails of our histograms when doing gene score resampling. The "big
+     * is better" setting reflects the original gene scores, not the log-transformed scores. Therefore if we are taking
+     * the log, and the user indicate smaller values are better, then we do want to use the upper tail. If we're not
+     * taking the log, then we just directly interpret what the user selected for 'bigIsBetter'. The exception that
+     * overrides is precision recall; Average Precision values are always "big is better".
      *
      * @return true if we are using the "upper tail" of our distributions.
      */
     public boolean upperTail() {
-        return this.getDoLog() && !this.getBigIsBetter() || !this.getDoLog() && this.getBigIsBetter();
+        return this.getDoLog() && !this.getBigIsBetter() || !this.getDoLog() && this.getBigIsBetter()
+                || this.getGeneSetResamplingScoreMethod().equals( GeneScoreMethod.PRECISIONRECALL );
     }
-
-    //    /**
-    //     * <p>
-    //     * useMultifunctionalityCorrection.
-    //     * </p>
-    //     *
-    //     * @return true if multifunctionality corrections should be applied, if possible.
-    //     * @deprecated this should always be true
-    //     */
-    //    public boolean useMultifunctionalityCorrection() {
-    //        /*
-    //         * Note that the intention is that this always be true. The reason to turn it off would be for testing or
-    //         * performance reasons.
-    //         */
-    //        return config.getBoolean( USE_MULTIFUNCTIONALITY_CORRECTION, true );
-    //    }
 
     /**
      * <p>
