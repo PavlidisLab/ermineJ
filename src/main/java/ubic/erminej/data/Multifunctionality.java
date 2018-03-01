@@ -195,13 +195,13 @@ public class Multifunctionality {
             }
         }
 
-        // log.info( fit.getCoefficients() );
-        if ( fit.getCoefficients().get( 1, 0 ) < 0 ) {
-            messenger.showStatus( String.format(
-                    "Multifunctionality correction skipped: coefficient is negative: %.2f ",
-                    fit.getCoefficients().get( 1, 0 ) ) );
-            return geneToScoreMap;
-        }
+        log.info( "MF regression fit coefficient=" + fit.getCoefficients().get( 1, 0 ) );
+//        if ( fit.getCoefficients().get( 1, 0 ) < 0 ) {
+//            messenger.showStatus( String.format(
+//                    "Multifunctionality correction skipped: coefficient is negative: %.2f ",
+//                    fit.getCoefficients().get( 1, 0 ) ) );
+//            return geneToScoreMap;
+//        }
 
         /*
          * The studentized residuals are normalized; this doesn't make _that_ much of a difference.

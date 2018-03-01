@@ -70,7 +70,6 @@ public class AnalysisWizardStep5 extends WizardStep {
     private boolean doFullEmpirical = false;
 
     private boolean doLog = true;
-    private boolean doMfCorr = true;
     private String extraHelp;
     private String help;
     private JRadioButton jRadioButtonMean;

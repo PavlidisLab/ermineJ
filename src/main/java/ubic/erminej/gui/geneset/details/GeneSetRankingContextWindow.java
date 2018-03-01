@@ -204,7 +204,7 @@ public class GeneSetRankingContextWindow extends JFrame {
 
         assert this.geneData != null;
 
-        if ( geneData.getSettings().getDoLog() ) {
+        if ( geneScores.isNegativeLog10Transformed() ) {
             /*
              * de-log..
              */
@@ -219,18 +219,11 @@ public class GeneSetRankingContextWindow extends JFrame {
         double min = DescriptiveWithMissing.min( new DoubleArrayList( ArrayUtils.toPrimitive( gs ) ) );
         double max = DescriptiveWithMissing.max( new DoubleArrayList( ArrayUtils.toPrimitive( gs ) ) );
 
-        if ( geneData.getSettings().getBigIsBetter() ) {
-            /*
-             * reverse the order of the axis?
-             */
-            double om = min;
-            min = max;
-            max = om;
-        }
-
         HistogramDataset series = new HistogramDataset();
         series.setType( HistogramType.RELATIVE_FREQUENCY );
         int numBins = 39;
+
+        assert min < max;
 
         series.addSeries( "Gene set", ArrayUtils.toPrimitive( geneSetScores ), numBins, min, max );
         series.addSeries( "Background", ArrayUtils.toPrimitive( gs ), numBins, min, max );

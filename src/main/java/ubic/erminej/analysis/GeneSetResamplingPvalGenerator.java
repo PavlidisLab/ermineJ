@@ -26,6 +26,7 @@ import java.util.Map;
 
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.SettingsHolder;
+import ubic.erminej.SettingsHolder.GeneScoreMethod;
 import ubic.erminej.data.Gene;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneSetResult;
@@ -37,25 +38,12 @@ import ubic.erminej.data.Histogram;
  * precision-recall curves (which are also calibrated by using resampling).
  *
  * @author Paul Pavlidis
- * @version $Id$
  */
 public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator {
 
     protected Histogram hist;
 
     protected GeneSetResamplingBkgDistGenerator generator;
-
-    /**
-     * Clone a generator; don't recompute the background.
-     *
-     * @param toclone a {@link ubic.erminej.analysis.GeneSetResamplingPvalGenerator} object.
-     * @param geneToScoreMap a {@link java.util.Map} object.
-     */
-    public GeneSetResamplingPvalGenerator( GeneSetResamplingPvalGenerator toclone, Map<Gene, Double> geneToScoreMap ) {
-        super( toclone.settings, toclone.geneAnnots, geneToScoreMap, toclone.messenger );
-        this.generator = toclone.generator;
-        this.hist = toclone.hist;
-    }
 
     /**
      * <p>
@@ -93,7 +81,7 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
         Collection<Gene> genesInSet = geneAnnots.getGeneSetGenes( geneSetName );
 
         // store scores for items in the class.
-        double[] groupPvalArr = new double[numGenesInSet];
+        double[] groupGeneScores = new double[numGenesInSet];
 
         int v_size = 0;
 
@@ -101,13 +89,13 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
         for ( Gene gene : genesInSet ) {
             // if it is in the data set. This is invariant under permutations.
             if ( geneToScoreMap.containsKey( gene ) ) {
-                groupPvalArr[v_size] = geneToScoreMap.get( gene );
+                groupGeneScores[v_size] = geneToScoreMap.get( gene );
                 v_size++;
             } // if in data set
         }
 
         // get raw score and pvalue.
-        double rawscore = generator.computeRawScore( groupPvalArr, genesInSet );
+        double rawscore = generator.computeRawScore( groupGeneScores, genesInSet );
 
         double pval = scoreToPval( numGenesInSet, rawscore );
 
@@ -189,24 +177,13 @@ public class GeneSetResamplingPvalGenerator extends AbstractGeneSetPvalGenerator
         GeneSetPvalRun.populateRanks( results );
 
         if ( useMultifunctionalityCorrection ) {
-            Map<Gene, Double> adjustScores = this.geneAnnots.getMultifunctionality().adjustScores( geneToScoreMap,
-                    false /* not ranks */, true /* weighted regression */ );
 
-            // /* Make the adjusted scores like the original scores in distribution */
-            // Map<Gene, Double> adjustedRanks = Rank.rankTransform( adjustScores );
-            // List<Double> originalScores = new ArrayList<Double>();
-            // originalScores.addAll( geneToScoreMap.values() );
-            // Collections.sort( originalScores );
-            // // maybe there is a better way to do this.
-            // for ( Gene g : adjustedRanks.keySet() ) {
-            // Double rank = adjustedRanks.get( g );
-            // int m = ( int ) Math.max( 0.0, Math.floor( rank ) );
-            // assert m < originalScores.size();
-            // // adjustScores.put( g, originalScores.get( m ) );
-            // }
+            boolean useRanks = false;//settings.getGeneSetResamplingScoreMethod().equals( SettingsHolder.GeneScoreMethod.PRECISIONRECALL );
+
+            Map<Gene, Double> adjustScores = this.geneAnnots.getMultifunctionality().adjustScores( geneToScoreMap,
+                    useRanks, true /* weighted regression */ );
 
             /* compute new results */
-            // GeneSetResamplingPvalGenerator pvg = new GeneSetResamplingPvalGenerator( this, adjustScores );
             GeneSetResamplingPvalGenerator pvg = new GeneSetResamplingPvalGenerator( this.settings, this.geneAnnots,
                     adjustScores, this.messenger );
 
