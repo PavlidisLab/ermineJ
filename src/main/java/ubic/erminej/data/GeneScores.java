@@ -52,6 +52,7 @@ import ubic.basecode.util.StatusStderr;
 import ubic.basecode.util.StatusViewer;
 import ubic.erminej.Settings;
 import ubic.erminej.SettingsHolder;
+import ubic.erminej.SettingsHolder.GeneScoreMethod;
 
 /**
  * Parse and store probe-&gt;score associations. The values are stored in a Map probeToPvalMap. This is used to see what
@@ -430,15 +431,17 @@ public class GeneScores {
      * </p>
      *
      * @return list of genes in order of their scores, where the <em>first</em> gene is the 'best'. If 'big is better',
-     *         genes with large scores will be given first. If smaller is better (pvalues) and the data are -log
-     *         transformed (usual), then the gene that had the smallest pvalue will be first.
+     *         genes with large scores will be given first. If smaller is better (e.g. pvalues) and the data are -log
+     *         transformed (usual), then the gene that had the smallest pvalue will be first. If smaller is better and
+     *         teh data are *not* log-transformed, then the values are given smallest-first order.
      */
     public List<Gene> getRankedGenes() {
 
         assert this.geneToScoreMap.keySet().containsAll( this.getPrunedGeneAnnotations().getGenes() );
         assert this.getPrunedGeneAnnotations().getGenes().containsAll( this.geneToScoreMap.keySet() );
 
-        final boolean flip = originalGeneAnnots.getSettings().upperTail();
+        final boolean flip = ( this.logTransform && !this.biggerIsBetter ) || ( !this.logTransform && this.biggerIsBetter );
+
         TreeMap<Gene, Double> m = new TreeMap<>( new Comparator<Gene>() {
 
             @Override
@@ -467,7 +470,9 @@ public class GeneScores {
         assert m.size() == this.geneToScoreMap.size();
         assert m.keySet().containsAll( this.geneToScoreMap.keySet() ); // !!
 
-        return Collections.unmodifiableList( new ArrayList<>( m.keySet() ) );
+        List<Gene> result = Collections.unmodifiableList( new ArrayList<>( m.keySet() ) );
+
+        return result;
     }
 
     /**

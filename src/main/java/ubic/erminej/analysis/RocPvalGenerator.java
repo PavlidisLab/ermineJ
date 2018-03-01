@@ -100,7 +100,7 @@ public class RocPvalGenerator extends AbstractGeneSetPvalGenerator {
 
         if ( useMultifunctionalityCorrection ) {
             Map<Gene, Double> adjustScores = this.geneAnnots.getMultifunctionality().adjustScores( geneToScoreMap,
-                    false /* not ranks */, false /* unweighted regression */ );
+                    false /* ranks */, false /* unweighted regression */ );
             RocPvalGenerator rpg = new RocPvalGenerator( settings, geneAnnots, adjustScores, messenger );
             Map<GeneSetTerm, GeneSetResult> mfCorrectedResults = rpg.generateGeneSetResults( false );
 
