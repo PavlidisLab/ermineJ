@@ -40,11 +40,10 @@ import ubic.basecode.math.distribution.ProbabilityComputer;
  * Stores distributions for geneSets ( a series of histograms). For generic histograms, use hep.aida.
  *
  * @author Shahmil Merchant, Paul Pavlidis
- * @version $Id$
  */
 public class Histogram {
     private static final double SMALL = 10e-13;
-    private static final double BINSPERUNIT = 500;
+    private static final double BINSPERUNIT = 5000;
     /** Constant <code>log</code> */
     protected static final Log log = LogFactory.getLog( Histogram.class );
     private int minimumGeneSetSize = 0;
@@ -87,6 +86,7 @@ public class Histogram {
 
         this.minimum = min;
         this.maximum = max;
+
         this.binSize = ( max - min ) / BINSPERUNIT;
         this.minimumGeneSetSize = minGeneSetSize;
         setNumRuns( numRuns );
