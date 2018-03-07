@@ -44,6 +44,8 @@ import ubic.basecode.math.distribution.ProbabilityComputer;
 public class Histogram {
     private static final double SMALL = 10e-13;
     private static final double BINSPERUNIT = 5000;
+    private static final int MINBINS = 1000;
+
     /** Constant <code>log</code> */
     protected static final Log log = LogFactory.getLog( Histogram.class );
     private int minimumGeneSetSize = 0;
@@ -115,11 +117,18 @@ public class Histogram {
 
     /**
      * <p>
-     * calcNumOfBins.
+     * calcNumOfBins and adjust binsize if necessary
      * </p>
      */
     public void calcNumOfBins() {
         numBins = ( int ) ( ( maximum - minimum ) / binSize );
+
+        if ( numBins < MINBINS ) {
+            log.warn( "Increasing number of bins to minimum value: " + MINBINS );
+            numBins = MINBINS;
+            binSize = ( maximum - minimum ) / numBins;
+        }
+
         if ( numBins < 1 ) {
             throw new IllegalStateException( "Histogram had no bins or too few bins. (" + numBins + ")" );
         }
