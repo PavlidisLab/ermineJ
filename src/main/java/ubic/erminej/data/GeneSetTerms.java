@@ -102,23 +102,6 @@ public class GeneSetTerms {
      * Constructor for GeneSetTerms.
      * </p>
      *
-     * @param inputStream assumed to be in recent format.
-     * @throws java.io.IOException if any.
-     * @throws org.xml.sax.SAXException if any.
-     */
-    public GeneSetTerms( InputStream inputStream, boolean obo ) throws IOException, SAXException {
-        if ( inputStream == null ) {
-            throw new IOException( "Input stream was null" );
-        }
-        this.initialize( inputStream, false, obo );
-        inputStream.close();
-    }
-
-    /**
-     * <p>
-     * Constructor for GeneSetTerms.
-     * </p>
-     *
      * @param i a {@link java.io.InputStream} object.
      * @param oldFormat if old XML format.
      * @param obo if obo format
@@ -132,7 +115,8 @@ public class GeneSetTerms {
 
     /**
      * <p>
-     * Constructor for GeneSetTerms. File type is detected by the name. If it has ".obo." in the name we assume it is not XML.
+     * Constructor for GeneSetTerms. File type is detected by the name. If it has ".obo." in the name we assume it is
+     * not XML.
      * </p>
      *
      * @param oldFormat set to true to indicate that the RDF is 'old style' (pre ~2008)

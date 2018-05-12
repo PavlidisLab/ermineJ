@@ -82,7 +82,7 @@ public class GOXMLParser extends GOParser {
         this.getGraph().addParentTo( "GO:0003674", ALL );
         this.getGraph().addParentTo( "GO:0008150", ALL );
         this.getGraph().addParentTo( "GO:0005575", ALL );
-        
+
         populateAspect();
 
         i.close();
