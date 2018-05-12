@@ -32,7 +32,7 @@ import ubic.basecode.util.FileTools;
  * @author Paul Pavlidis
  * @version $Id$
  */
-public class XMLFileFilter extends FileFilter {
+public class GOFileFilter extends FileFilter {
 
     /** {@inheritDoc} */
     @Override
@@ -42,7 +42,7 @@ public class XMLFileFilter extends FileFilter {
             return true;
         }
 
-        return FileTools.hasXMLExtension( f.getName() );
+        return FileTools.hasXMLExtension( f.getName() ) || f.getName().toLowerCase().matches( ".+?\\.obo\\..*" );
 
     }
 

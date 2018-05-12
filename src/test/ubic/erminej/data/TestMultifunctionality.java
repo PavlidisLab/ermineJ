@@ -51,7 +51,7 @@ public class TestMultifunctionality {
         ZipInputStream z = new ZipInputStream(
                 TestMultifunctionality.class.getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
         z.getNextEntry();
-        GeneSetTerms geneSets = new GeneSetTerms( z );
+        GeneSetTerms geneSets = new GeneSetTerms( z, false );
 
         assertEquals( 32508, geneSets.getGeneSets().size() ); // rechecked (includes the roots)
 

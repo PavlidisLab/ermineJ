@@ -38,7 +38,7 @@ import ubic.basecode.util.RegressionTesting;
  */
 public class TestGOParser {
 
-    private GOParser gOParser = null;
+    private GOParser goParser = null;
 
     /**
      * This sample is of a rather old version of the ontology
@@ -48,23 +48,24 @@ public class TestGOParser {
     @Test
     public void testGOParser() throws Exception {
 
-        InputStream i = TestGOParser.class.getResourceAsStream( "/data/go-termdb-sample.xml" );
+        try (InputStream i = TestGOParser.class.getResourceAsStream( "/data/go-termdb-sample.xml" )) {
 
-        if ( i == null ) {
-            throw new Exception( "Couldn't read the sample file" );
+            if ( i == null ) {
+                throw new Exception( "Couldn't read the sample file" );
+            }
+            goParser = new GOXMLParser( i );
+
+            String actualReturn = goParser.getGraph().toString();
+
+            String expectedReturn = RegressionTesting.readTestResult( "/data/goparsertestoutput.txt" );
+            assertEquals( "return", expectedReturn, actualReturn );
+
+            assertTrue( goParser.getGraph().getRoot().toString().startsWith( "all" ) );
+            /*
+             * assertEquals( "Diffs: " + RegressionTesting.regress( expectedReturn, actualReturn ), expectedReturn,
+             * actualReturn );
+             */
         }
-        gOParser = new GOParser( i );
-
-        String actualReturn = gOParser.getGraph().toString();
-
-        String expectedReturn = RegressionTesting.readTestResult( "/data/goparsertestoutput.txt" );
-        assertEquals( "return", expectedReturn, actualReturn );
-
-        assertTrue( gOParser.getGraph().getRoot().toString().startsWith( "all" ) );
-        /*
-         * assertEquals( "Diffs: " + RegressionTesting.regress( expectedReturn, actualReturn ), expectedReturn,
-         * actualReturn );
-         */
     }
 
     /**
@@ -75,11 +76,11 @@ public class TestGOParser {
     @Test
     public void testGOParser3() throws Exception {
         InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200408-termdb.xml.gz" ) );
-        gOParser = new GOParser( z, true );
+        goParser = new GOXMLParser( z, true );
 
-        assertNotNull( gOParser.getGraph().getRoot() );
-        assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
-        DirectedGraphNode<String, GeneSetTerm> testnode = gOParser.getGraph().get( "GO:0045034" );
+        assertNotNull( goParser.getGraph().getRoot() );
+        assertEquals( 3, goParser.getGraph().getRoot().getChildNodes().size() );
+        DirectedGraphNode<String, GeneSetTerm> testnode = goParser.getGraph().get( "GO:0045034" );
 
         assertNotNull( testnode );
         Set<String> parentKeys = testnode.getParentKeys();
@@ -92,21 +93,22 @@ public class TestGOParser {
     @Test
     public void testGOParserB() throws Exception {
 
-        InputStream i = TestGOParser.class.getResourceAsStream( "/data/go_daily-termdb.rdf-sample2.xml" );
+        try (InputStream i = TestGOParser.class.getResourceAsStream( "/data/go_daily-termdb.rdf-sample2.xml" )) {
 
-        if ( i == null ) {
-            throw new Exception( "Couldn't read the sample file" );
+            if ( i == null ) {
+                throw new Exception( "Couldn't read the sample file" );
+            }
+
+            goParser = new GOXMLParser( i );
+
+            String actualReturn = goParser.getGraph().toString();
+            String expectedReturn = RegressionTesting.readTestResult( "/data/goparsertestoutput.2.txt" );
+            assertEquals( "return", expectedReturn, actualReturn );
+
+            assertTrue( goParser.getGraph().getRoot().toString().startsWith( "all" ) );
+
+            assertNotNull( goParser.getGraph().getRoot() );
         }
-
-        gOParser = new GOParser( i );
-
-        String actualReturn = gOParser.getGraph().toString();
-        String expectedReturn = RegressionTesting.readTestResult( "/data/goparsertestoutput.2.txt" );
-        assertEquals( "return", expectedReturn, actualReturn );
-
-        assertTrue( gOParser.getGraph().getRoot().toString().startsWith( "all" ) );
-
-        assertNotNull( gOParser.getGraph().getRoot() );
     }
 
     @Test
@@ -114,9 +116,9 @@ public class TestGOParser {
         ZipInputStream z = new ZipInputStream(
                 TestGOParser.class.getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
         z.getNextEntry();
-        gOParser = new GOParser( z );
+        goParser = new GOXMLParser( z );
 
-        assertNotNull( gOParser.getGraph().getRoot() );
+        assertNotNull( goParser.getGraph().getRoot() );
 
     }
 
@@ -128,11 +130,11 @@ public class TestGOParser {
     @Test
     public void testGOParserOld() throws Exception {
         InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200212-termdb.xml.gz" ) );
-        gOParser = new GOParser( z, true );
+        goParser = new GOXMLParser( z, true );
 
-        assertNotNull( gOParser.getGraph().getRoot() );
-        assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
-        DirectedGraphNode<String, GeneSetTerm> testnode = gOParser.getGraph().get( "GO:0045034" );
+        assertNotNull( goParser.getGraph().getRoot() );
+        assertEquals( 3, goParser.getGraph().getRoot().getChildNodes().size() );
+        DirectedGraphNode<String, GeneSetTerm> testnode = goParser.getGraph().get( "GO:0045034" );
 
         assertNotNull( testnode );
         Set<String> parentKeys = testnode.getParentKeys();
@@ -142,10 +144,10 @@ public class TestGOParser {
     @Test
     public void testGOParserOld2() throws Exception {
         InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200109-termdb.xml.gz" ) );
-        gOParser = new GOParser( z, true );
-        assertNotNull( gOParser.getGraph().getRoot() );
-        assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
-        DirectedGraphNode<String, GeneSetTerm> testnode = gOParser.getGraph().get( "GO:0008920" );
+        goParser = new GOXMLParser( z, true );
+        assertNotNull( goParser.getGraph().getRoot() );
+        assertEquals( 3, goParser.getGraph().getRoot().getChildNodes().size() );
+        DirectedGraphNode<String, GeneSetTerm> testnode = goParser.getGraph().get( "GO:0008920" );
 
         assertNotNull( testnode );
         Set<String> parentKeys = testnode.getParentKeys();
@@ -178,14 +180,35 @@ public class TestGOParser {
     @Test
     public void testGOParserOld3() throws Exception {
         InputStream z = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/go_200111-termdb.xml.gz" ) );
-        gOParser = new GOParser( z, true );
-        assertNotNull( gOParser.getGraph().getRoot() );
-        assertEquals( 3, gOParser.getGraph().getRoot().getChildNodes().size() );
-        DirectedGraphNode<String, GeneSetTerm> testnode = gOParser.getGraph().get( "GO:0008920" );
+        goParser = new GOXMLParser( z, true );
+        assertNotNull( goParser.getGraph().getRoot() );
+        assertEquals( 3, goParser.getGraph().getRoot().getChildNodes().size() );
+        DirectedGraphNode<String, GeneSetTerm> testnode = goParser.getGraph().get( "GO:0008920" );
 
         assertNotNull( testnode );
         Set<String> parentKeys = testnode.getParentKeys();
         assertTrue( parentKeys.size() > 0 );
+    }
+
+    @Test
+    public void testGOOBO1() throws Exception {
+        try (InputStream z = new GZIPInputStream(TestGOParser.class.getResourceAsStream( "/data/goslim_generic.obo.txt.gz" ))) {
+            goParser = new GOOBOParser( z );
+
+            assertNotNull( goParser.getGraph().getRoot() );
+            assertEquals( 162, goParser.getGraph().getItems().size() );
+
+            assertNotNull( goParser.getGraph().get( "GO:0042393" ) );
+            assertNotNull( goParser.getGraph().get( "GO:0043167" ) );
+
+            assertEquals( 3, goParser.getGraph().getRoot().getChildNodes().size() );
+            DirectedGraphNode<String, GeneSetTerm> testnode = goParser.getGraph().get( "GO:0140014" );
+
+            assertNotNull( testnode );
+            Set<String> parentKeys = testnode.getParentKeys();
+            assertTrue( parentKeys.size() > 0 );
+
+        }
     }
 
     //

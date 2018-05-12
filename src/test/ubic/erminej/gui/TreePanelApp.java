@@ -24,6 +24,7 @@ import javax.swing.UIManager;
 import org.xml.sax.SAXException;
 
 import ubic.erminej.data.GOParser;
+import ubic.erminej.data.GOXMLParser;
 import ubic.erminej.gui.geneset.tree.GeneSetTreeNode;
 
 /**
@@ -56,8 +57,8 @@ public class TreePanelApp {
 
         InputStream i =
                 // GOParser.class.getResourceAsStream("/data/go-termdb-sample.xml");
-                GOParser.class.getResourceAsStream( "/data/go_daily-termdb.rdf-sample2.xml" );
-        gOParser = new GOParser( i );
+                GOXMLParser.class.getResourceAsStream( "/data/go_daily-termdb.rdf-sample2.xml" );
+        gOParser = new GOXMLParser( i );
         final JTree t = gOParser.getGraph().treeView( GeneSetTreeNode.class );
 
         // Create and set up the window.
