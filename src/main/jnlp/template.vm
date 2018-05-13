@@ -1,4 +1,4 @@
-<jnlp spec="$jnlpspec" codebase="http://erminej.msl.ubc.ca/webstart" href="$outputFile">
+<jnlp spec="$jnlpspec" codebase="https://home.pavlab.msl.ubc.ca/ermineJ/webstart" href="$outputFile">
 	<information>
 	<title>ErmineJ</title>
 	<vendor>$project.Organization.Name</vendor>
@@ -15,7 +15,7 @@
 	</security>
 #end
  	<resources>
-	<j2se version="$j2seVersion" java-vm-args="-Xmx3g -Xms256m -Xss8m" />
+	<j2se version="$j2seVersion" java-vm-args="-Xmx5g -Xms256m -Xss8m" />
      	$dependencies 
 	</resources> 
 	<application-desc main-class="$mainClass"/>
