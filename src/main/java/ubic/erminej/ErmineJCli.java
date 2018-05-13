@@ -258,7 +258,7 @@ public class ErmineJCli {
             System.exit( 1 );
         } catch ( SAXException e ) {
             statusMessenger.showStatus( "Gene Ontology file format is incorrect. "
-                    + "\nPlease check that it is a valid XML file. "
+                    + "\nPlease check that it is a valid XML or OBO file. "
                     + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
             System.exit( 1 );
         }
@@ -413,7 +413,7 @@ public class ErmineJCli {
         OptionBuilder.hasArg();
         OptionBuilder.withLongOpt( "classFile" );
         OptionBuilder
-                .withDescription( "Gene set ('class') file, e.g. GO XML file [required unless using GUI]" );
+                .withDescription( "Gene set ('class') file, e.g. GO file [XML or OBO; required unless using GUI]" );
         OptionBuilder
                 .withArgName( "file" );
         options.addOption( OptionBuilder.create( 'c' ) );
