@@ -43,7 +43,8 @@ import ubic.erminej.Settings;
  * 
  * Related: {@link ubic.erminej.data.GeneSet}, which represents the actual annotations (and Gene and Probes also keep
  * track of their own)
- * and {@link ubic.erminej.data.UserDefinedGeneSetManager} which helps deal with ones the user has stored separately from
+ * and {@link ubic.erminej.data.UserDefinedGeneSetManager} which helps deal with ones the user has stored separately
+ * from
  * GO
  *
  * @author Paul Pavlidis
@@ -101,36 +102,21 @@ public class GeneSetTerms {
      * Constructor for GeneSetTerms.
      * </p>
      *
-     * @param inputStream assumed to be in recent format.
-     * @throws java.io.IOException if any.
-     * @throws org.xml.sax.SAXException if any.
-     */
-    public GeneSetTerms( InputStream inputStream ) throws IOException, SAXException {
-        if ( inputStream == null ) {
-            throw new IOException( "Input stream was null" );
-        }
-        this.initialize( inputStream, false );
-        inputStream.close();
-    }
-
-    /**
-     * <p>
-     * Constructor for GeneSetTerms.
-     * </p>
-     *
      * @param i a {@link java.io.InputStream} object.
-     * @param oldFormat a boolean.
+     * @param oldFormat if old XML format.
+     * @param obo if obo format
      * @throws org.xml.sax.SAXException if any.
      * @throws java.io.IOException if any.
      */
-    public GeneSetTerms( InputStream i, boolean oldFormat ) throws SAXException, IOException {
-        this.initialize( i, oldFormat );
+    public GeneSetTerms( InputStream i, boolean oldFormat, boolean obo ) throws SAXException, IOException {
+        this.initialize( i, oldFormat, obo );
         i.close();
     }
 
     /**
      * <p>
-     * Constructor for GeneSetTerms.
+     * Constructor for GeneSetTerms. File type is detected by the name. If it has ".obo." in the name we assume it is
+     * not XML.
      * </p>
      *
      * @param oldFormat set to true to indicate that the RDF is 'old style' (pre ~2008)
@@ -143,9 +129,10 @@ public class GeneSetTerms {
             throw new IllegalArgumentException( "Invalid filename " + fileName + " or no filename was given" );
         }
 
-        InputStream i = FileTools.getInputStreamFromPlainOrCompressedFile( fileName );
-        this.initialize( i, oldFormat );
-        i.close();
+        try (InputStream i = FileTools.getInputStreamFromPlainOrCompressedFile( fileName )) {
+            boolean obo = fileName.toLowerCase().matches( ".+?\\.obo\\..*" );
+            this.initialize( i, oldFormat, obo );
+        }
     }
 
     /**
@@ -434,11 +421,19 @@ public class GeneSetTerms {
     /**
      * @param inputStream
      * @param oldFormat
+     * @param obo if this is OBO format (presumed 1.2) rather than XML
      * @throws IOException
      * @throws SAXException
      */
-    private void initialize( InputStream inputStream, boolean oldFormat ) throws IOException, SAXException {
-        GOParser parser = new GOParser( inputStream, oldFormat );
+    private void initialize( InputStream inputStream, boolean oldFormat, boolean obo ) throws IOException, SAXException {
+        GOParser parser;
+
+        if ( obo ) {
+            parser = new GOOBOParser( inputStream );
+        } else {
+            parser = new GOXMLParser( inputStream, oldFormat );
+
+        }
         this.graph = parser.getGraph();
 
         assert graph != null;

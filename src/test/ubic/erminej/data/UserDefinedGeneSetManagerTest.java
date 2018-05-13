@@ -45,7 +45,7 @@ public class UserDefinedGeneSetManagerTest {
         InputStream ism = UserDefinedGeneSetManagerTest.class.getResourceAsStream( "/data/HG-U95A.an.txt" );
         InputStream is = this.getClass().getResourceAsStream( "/data/go_daily-termdb.rdf-sample2.xml" );
 
-        GeneSetTerms gonames = new GeneSetTerms( is );
+        GeneSetTerms gonames = new GeneSetTerms( is, false, false );
         GeneAnnotationParser p = new GeneAnnotationParser( gonames );
         geneAnnots = p.read( ism, Format.DEFAULT, new Settings() );
 

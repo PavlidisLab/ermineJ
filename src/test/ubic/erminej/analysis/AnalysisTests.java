@@ -72,7 +72,7 @@ public class AnalysisTests {
         ZipInputStream z = new ZipInputStream(
                 TestGeneAnnotations.class.getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
         z.getNextEntry();
-        GeneSetTerms gon = new GeneSetTerms( z );
+        GeneSetTerms gon = new GeneSetTerms( z, false, false );
         z.close();
 
         GeneAnnotationParser p = new GeneAnnotationParser( gon );

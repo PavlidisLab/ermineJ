@@ -48,7 +48,7 @@ public class ScoreQuantileTest {
         InputStream ism = GeneScoreReaderTest.class.getResourceAsStream( "/data/test.an.txt" );
 
         GeneSetTerms geneSetTerms = new GeneSetTerms(
-                GeneScoreReaderTest.class.getResourceAsStream( "/data/go-termdb-test.xml" ) );
+                GeneScoreReaderTest.class.getResourceAsStream( "/data/go-termdb-test.xml" ), false, false );
         GeneAnnotationParser p = new GeneAnnotationParser( geneSetTerms );
         GeneAnnotations g = p.readDefault( ism, null, s, false );
 

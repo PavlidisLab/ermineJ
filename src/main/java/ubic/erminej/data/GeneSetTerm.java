@@ -23,24 +23,24 @@ package ubic.erminej.data;
  */
 public class GeneSetTerm implements Comparable<GeneSetTerm> {
 
-    private static String NO_DEFINITION_AVAILABLE = "[No definition available]";
-
     /** Constant <code>NO_NAME_AVAILABLE="[No term available]"</code> */
     protected static String NO_NAME_AVAILABLE = "[No term available]";
 
+    private static String NO_DEFINITION_AVAILABLE = "[No definition available]";
+
     private String aspect;
-
-    private String oldName;
-
-    private String oldDefinition;
-
-    private String id = null;
-
-    private String name = NO_NAME_AVAILABLE;
 
     private String definition = NO_DEFINITION_AVAILABLE;
 
+    private String id = null;
+
     private boolean isUserDefined = false;
+
+    private String name = NO_NAME_AVAILABLE;
+
+    private String oldDefinition;
+
+    private String oldName;
 
     /**
      * <p>
@@ -198,7 +198,7 @@ public class GeneSetTerm implements Comparable<GeneSetTerm> {
         else if ( this.aspect.equals( aspect ) )
             return;
         else
-            throw new IllegalArgumentException( "Attempt to change aspect" );
+            throw new IllegalArgumentException( "Attempt to change aspect of " + this.getId() );
     }
 
     /**
@@ -211,6 +211,15 @@ public class GeneSetTerm implements Comparable<GeneSetTerm> {
     public void setDefinition( String d ) {
         this.oldDefinition = this.getDefinition();
         this.definition = d;
+    }
+
+    /**
+     * Only use during creation
+     * 
+     * @param id
+     */
+    public void setId( String id ) {
+        this.id = id;
     }
 
     /**

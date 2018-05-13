@@ -64,7 +64,7 @@ import ubic.erminej.Settings;
 import ubic.erminej.data.AnnotationFileFetcher;
 import ubic.erminej.data.GeneAnnotationParser.Format;
 import ubic.erminej.gui.file.DataFileFilter;
-import ubic.erminej.gui.file.XMLFileFilter;
+import ubic.erminej.gui.file.GOFileFilter;
 import ubic.erminej.gui.util.GuiUtil;
 import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 
@@ -193,8 +193,8 @@ public class StartupPanel extends JPanel {
     void classBrowseButton_actionPerformed() {
         JFileChooser chooser = new JFileChooser( settings.getDataDirectory() );
         chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
-        chooser.setDialogTitle( "Choose the GO XML file:" );
-        XMLFileFilter fileFilter = new XMLFileFilter();
+        chooser.setDialogTitle( "Choose the GO file (XML or OBO):" );
+        GOFileFilter fileFilter = new GOFileFilter();
         chooser.setFileFilter( fileFilter ); // JFileChooser method
         chooser.setAcceptAllFileFilterUsed( false );
         int result = chooser.showOpenDialog( this );
@@ -269,7 +269,7 @@ public class StartupPanel extends JPanel {
         File goFile = new File( goFileName );
 
         if ( goFileName.length() == 0 ) {
-            GuiUtil.error( "You must enter the Gene Ontology XML file location" );
+            GuiUtil.error( "You must enter the Gene Ontology file (XML or OBO) location" );
         } else if ( annotFileName.length() == 0 ) {
             GuiUtil.error( "You must enter the annotation file location for your experiment" );
         } else if ( !annotFile.exists() || !annotFile.canRead() ) {
@@ -563,7 +563,7 @@ public class StartupPanel extends JPanel {
     private JPanel makeGOFilePickerPanel() {
         // /// panel to hold GO file browser
         JPanel classPanel = new JPanel();
-        TitledBorder classPanelBorder = BorderFactory.createTitledBorder( "Gene Ontology XML file" );
+        TitledBorder classPanelBorder = BorderFactory.createTitledBorder( "Gene Ontology file (XML or OBO)" );
         classPanel.setBorder( classPanelBorder );
         this.classFileTextField = GuiUtil.fileBrowsePanel( classPanel, new GOFilePickListener( this ) );
         GroupLayout cpL = new GroupLayout( classPanel );
@@ -612,10 +612,10 @@ public class StartupPanel extends JPanel {
     private void saveSettings() {
         settings.setClassFile( classFileTextField.getText() );
         settings.setAnnotFile( annotFileTextField.getText() );
-//        String formatS = ( String ) annotFormat.getSelectedItem();
-//
-//        if ( formatS.equals( "ErmineJ" ) ) {
-            settings.setAnnotFormat( Format.DEFAULT );
+        //        String formatS = ( String ) annotFormat.getSelectedItem();
+        //
+        //        if ( formatS.equals( "ErmineJ" ) ) {
+        settings.setAnnotFormat( Format.DEFAULT );
         //        } else if ( formatS.equals( "Affy CSV" ) ) {
         //            settings.setAnnotFormat( Format.AFFYCSV );
         //        } else {

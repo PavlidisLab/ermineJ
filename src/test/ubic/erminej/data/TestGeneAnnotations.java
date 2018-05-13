@@ -58,7 +58,7 @@ public class TestGeneAnnotations {
             ZipInputStream z = new ZipInputStream(
                     TestGeneAnnotations.class.getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
             z.getNextEntry();
-            goNames = new GeneSetTerms( z );
+            goNames = new GeneSetTerms( z, false, false );
             z.close();
         } catch ( IOException e ) {
             e.printStackTrace();
@@ -387,9 +387,10 @@ public class TestGeneAnnotations {
 
         InputStream z = new GZIPInputStream(
                 TestGeneAnnotations.class.getResourceAsStream( "/data/go_200109-termdb.xml.gz" ) );
-        GeneSetTerms go = new GeneSetTerms( z, true );
+        GeneSetTerms go = new GeneSetTerms( z, true, false );
 
         for ( GeneSetTerm g : go.getTerms() ) {
+            if ( g.getId().equals( "GO:0003673" ) ) continue;
             assertNotNull( g.toString(), g.getAspect() );
         }
 

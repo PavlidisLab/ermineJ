@@ -129,7 +129,7 @@ public class GeneSetResamplingBkgDistGenerator extends AbstractResamplingGeneSet
     /**
      * Basic method to calculate the raw score for a gene set, given an array of the gene scores for items in the class.
      * Note that speed here is important. In the prototypical GSR method, the score is the mean of the values for the
-     * gene. For precision-recall, it is the average precision.
+     * genes. For precision-recall, it is the average precision.
      *
      * @param genevalues double[] raw scores for the items in the class.
      * @param genesInSet a {@link java.util.Collection} object.
@@ -169,7 +169,7 @@ public class GeneSetResamplingBkgDistGenerator extends AbstractResamplingGeneSet
         int numGenes = geneScores.length;
         List<Gene> genes = new Vector<>( geneRanks.keySet() );
         assert hist != null;
-        assert numGenes >= classMaxSize;
+        //     assert numGenes >= classMaxSize;
 
         // // we use this throughout.
         // int[] deck = new int[numGenes];
@@ -265,6 +265,10 @@ public class GeneSetResamplingBkgDistGenerator extends AbstractResamplingGeneSet
             histogramMax = 1.0;
             histogramMin = 0.0;
         } else {
+            
+            /*
+             * For the other methods, e.g. mean, median or mean above quantile, the max possible value is the max score.
+             */
 
             double[] pgpvals = ArrayUtils.toPrimitive( geneScores );
 
