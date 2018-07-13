@@ -41,7 +41,7 @@ public class TestMultifunctionality {
         settings.setLoadUserDefined( false );
         settings.setMaxClassSize( 100 );
         settings.setMinClassSize( 10 );
-
+        settings.setBigIsBetter( true );
         /*
          * JG was provided with this file for cross-checking.
          */
