@@ -40,7 +40,6 @@ import javax.swing.GroupLayout;
 import javax.swing.GroupLayout.Alignment;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -79,8 +78,8 @@ public class StartupPanel extends JPanel {
     private static final String GO_ARCHIVE_DIR = "http://archive.geneontology.org/latest-termdb";
 
     private static final String INSTRUCTIONS = "<html>For annotation files, visit "
-            + "<a href=\"http://www.msl.ubc.ca/Gemma/showAllArrayDesigns.html/\">http://www.msl.ubc.ca/Gemma/showAllArrayDesigns.html</a><br/> or"
-            + " <a href=\"http://www.msl.ubc.ca/microannots/\">http://www.msl.ubc.ca/microannots/</a></html>.";
+            + "<a href=\"https://gemma.msl.ubc.ca/arrays/showAllArrayDesigns.html/\">https://gemma.msl.ubc.ca/arrays/showAllArrayDesigns.html</a><br/> or"
+            + " <a href=\"https://gemma.msl.ubc.ca/annots/\">https://gemma.msl.ubc.ca/annots/</a></html>.";
 
     private static Log log = LogFactory.getLog( StartupPanel.class );
     private static final String DEFAULT_GO_TERM_FILE_NAME = "go_daily-termdb.rdf-xml.gz";

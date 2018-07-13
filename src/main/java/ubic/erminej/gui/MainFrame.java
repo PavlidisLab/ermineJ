@@ -119,6 +119,11 @@ import ubic.erminej.gui.util.StatusJlabel;
  */
 public class MainFrame extends JFrame {
 
+    /**
+     * 
+     */
+    private static final String GEMMA_ANNOTS_URL = "https://gemma.msl.ubc.ca/annots";
+
     class ResultSetMenuItem extends JMenuItem {
         private final GeneSetPvalRun resultSet;
 
@@ -1640,11 +1645,8 @@ public class MainFrame extends JFrame {
         geneAnnotsWebLinkMenuItem.addActionListener( new ActionListener() {
             @Override
             public void actionPerformed( ActionEvent e ) {
-                try {
-                    /*
-                     * FIXME make this a msl domain.
-                     */
-                    BrowserLauncher.openURL( "http://www.chibi.ubc.ca/microannots" );
+                try { 
+                    BrowserLauncher.openURL( GEMMA_ANNOTS_URL );
                 } catch ( Exception ex ) {
                     GuiUtil.error( "Could not open a web browser window to get annotations" );
                 }
