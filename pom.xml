@@ -49,7 +49,7 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
-			<version>4.10</version>
+			<version>4.13.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -408,7 +408,7 @@
 			<!-- needed for commons-configuration builders -->
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
-			<version>1.8.3</version>
+			<version>1.9.2</version>
 		</dependency>
 		<dependency>
 			<groupId>forehead</groupId>
@@ -438,7 +438,7 @@
 		<repository>
 			<id>central</id>
 			<name>central</name>
-			<url>http://repo1.maven.org/maven2/</url>
+			<url>https://repo1.maven.org/maven2/</url>
 			<layout>default</layout>
 			<snapshots>
 				<enabled>false</enabled>
