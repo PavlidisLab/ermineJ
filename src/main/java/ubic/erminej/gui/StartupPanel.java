@@ -70,19 +70,22 @@ import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 /**
  * Panel shown on initial startup of the application.
  *
- * @author paul
+ * @author  paul
  * @version $Id$
  */
 public class StartupPanel extends JPanel {
 
-    private static final String GO_ARCHIVE_DIR = "http://archive.geneontology.org/latest-termdb";
+    /**
+     * 
+     */
+    private static final String GO_OBO_LOCATION = "http://purl.obolibrary.org/obo/go.obo";
 
     private static final String INSTRUCTIONS = "<html>For annotation files, visit "
             + "<a href=\"https://gemma.msl.ubc.ca/arrays/showAllArrayDesigns.html/\">https://gemma.msl.ubc.ca/arrays/showAllArrayDesigns.html</a><br/> or"
             + " <a href=\"https://gemma.msl.ubc.ca/annots/\">https://gemma.msl.ubc.ca/annots/</a></html>.";
 
     private static Log log = LogFactory.getLog( StartupPanel.class );
-    private static final String DEFAULT_GO_TERM_FILE_NAME = "go_daily-termdb.rdf-xml.gz";
+    private static final String DEFAULT_GO_TERM_FILE_NAME = "go.obo";
 
     // for testing.
     /**
@@ -90,7 +93,7 @@ public class StartupPanel extends JPanel {
      * main.
      * </p>
      *
-     * @param args an array of {@link java.lang.String} objects.
+     * @param  args                an array of {@link java.lang.String} objects.
      * @throws java.lang.Exception if any.
      */
     public static void main( String[] args ) throws Exception {
@@ -130,7 +133,7 @@ public class StartupPanel extends JPanel {
      * Constructor for StartupPanel.
      * </p>
      *
-     * @param settings a {@link ubic.erminej.Settings} object.
+     * @param settings        a {@link ubic.erminej.Settings} object.
      * @param statusMessenger a {@link ubic.basecode.util.StatusViewer} object.
      */
     public StartupPanel( Settings settings, StatusViewer statusMessenger ) {
@@ -192,7 +195,7 @@ public class StartupPanel extends JPanel {
     void classBrowseButton_actionPerformed() {
         JFileChooser chooser = new JFileChooser( settings.getDataDirectory() );
         chooser.setCurrentDirectory( new File( settings.getDataDirectory() ) );
-        chooser.setDialogTitle( "Choose the GO file (XML or OBO):" );
+        chooser.setDialogTitle( "Choose the GO file (OBO format):" );
         GOFileFilter fileFilter = new GOFileFilter();
         chooser.setFileFilter( fileFilter ); // JFileChooser method
         chooser.setAcceptAllFileFilterUsed( false );
@@ -230,7 +233,7 @@ public class StartupPanel extends JPanel {
             settings.setDataDirectory( projectFile.getParent() );
 
             /*
-             * Now set the values in the xml and annotation file fields as well ...
+             * Now set the values in the obo and annotation file fields as well ...
              */
             Settings projectSettings;
             try {
@@ -268,7 +271,7 @@ public class StartupPanel extends JPanel {
         File goFile = new File( goFileName );
 
         if ( goFileName.length() == 0 ) {
-            GuiUtil.error( "You must enter the Gene Ontology file (XML or OBO) location" );
+            GuiUtil.error( "You must enter the Gene Ontology file (OBO format) location" );
         } else if ( annotFileName.length() == 0 ) {
             GuiUtil.error( "You must enter the annotation file location for your experiment" );
         } else if ( !annotFile.exists() || !annotFile.canRead() ) {
@@ -397,7 +400,7 @@ public class StartupPanel extends JPanel {
 
                     classFileTextField.setText( "Attempting to locate ..." );
 
-                    URL urlPattern = new URL( GO_ARCHIVE_DIR + "/go_daily-termdb.rdf-xml.gz" );
+                    URL urlPattern = new URL( GO_OBO_LOCATION );
 
                     InputStream inputStream = new BufferedInputStream( urlPattern.openStream() );
                     String localGoFileName = testPath;
@@ -562,7 +565,7 @@ public class StartupPanel extends JPanel {
     private JPanel makeGOFilePickerPanel() {
         // /// panel to hold GO file browser
         JPanel classPanel = new JPanel();
-        TitledBorder classPanelBorder = BorderFactory.createTitledBorder( "Gene Ontology file (XML or OBO)" );
+        TitledBorder classPanelBorder = BorderFactory.createTitledBorder( "Gene Ontology file (OBO)" );
         classPanel.setBorder( classPanelBorder );
         this.classFileTextField = GuiUtil.fileBrowsePanel( classPanel, new GOFilePickListener( this ) );
         GroupLayout cpL = new GroupLayout( classPanel );

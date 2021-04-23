@@ -75,19 +75,19 @@ public abstract class GOParser {
                 n.getItem().setAspect( "molecular_function" );
                 for ( DirectedGraphNode<String, GeneSetTerm> t : n.getAllChildNodes() ) {
                     t.getItem().setAspect( "molecular_function" );
-                    fillAspect( t );
+                   // fillAspect( t );
                 }
             } else if ( n.getKey().equals( "GO:0008150" ) ) {
                 n.getItem().setAspect( "biological_process" );
                 for ( DirectedGraphNode<String, GeneSetTerm> t : n.getAllChildNodes() ) {
                     t.getItem().setAspect( "biological_process" );
-                    fillAspect( t );
+                  //  fillAspect( t );
                 }
             } else if ( n.getKey().equals( "GO:0005575" ) ) {
                 n.getItem().setAspect( "cellular_component" );
                 for ( DirectedGraphNode<String, GeneSetTerm> t : n.getAllChildNodes() ) {
                     t.getItem().setAspect( "cellular_component" );
-                    fillAspect( t );
+                  //  fillAspect( t );
                 }
             } else if ( n.getKey().equals( ROOT ) || n.getKey().equals( ALL ) ) {
                 /*

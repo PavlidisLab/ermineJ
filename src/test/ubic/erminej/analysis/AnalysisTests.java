@@ -19,6 +19,7 @@ import static org.junit.Assert.assertNotNull;
 
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.zip.GZIPInputStream;
 import java.util.zip.ZipInputStream;
 
 import org.junit.BeforeClass;
@@ -35,6 +36,7 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
 import ubic.erminej.data.GeneAnnotations;
 import ubic.erminej.data.GeneScores;
 import ubic.erminej.data.GeneSetTerms;
+import ubic.erminej.data.TestGOParser;
 import ubic.erminej.data.TestGeneAnnotations;
 
 /**
@@ -69,20 +71,19 @@ public class AnalysisTests {
         s.setClassFile( AbstractPvalGeneratorTest.class.getResource( "/data/go_daily-termdb.rdf-xml.zip" ).getFile() );
         s.setRawFile( AbstractPvalGeneratorTest.class.getResource( "/data/melanoma_and_sarcomaMAS5.txt" ).getFile() );
 
-        ZipInputStream z = new ZipInputStream(
-                TestGeneAnnotations.class.getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
-        z.getNextEntry();
-        GeneSetTerms gon = new GeneSetTerms( z, false, false );
-        z.close();
+        try (InputStream z = new GZIPInputStream( AnalysisTests.class.getResourceAsStream( "/data/goslim_generic.obo.txt.gz" ) );
+                InputStream ism = AbstractPvalGeneratorTest.class.getResourceAsStream( "/data/HG-U95A.an.txt" );
+                InputStream is = AbstractPvalGeneratorTest.class
+                        .getResourceAsStream( "/data/one-way-anova-parsed.txt" );) {
+            GeneSetTerms gon = new GeneSetTerms( z );
 
-        GeneAnnotationParser p = new GeneAnnotationParser( gon );
-        InputStream ism = AbstractPvalGeneratorTest.class.getResourceAsStream( "/data/HG-U95A.an.txt" );
-        annotations = p.read( ism, Format.DEFAULT, s );
-        ism.close();
+            GeneAnnotationParser p = new GeneAnnotationParser( gon );
 
-        InputStream is = AbstractPvalGeneratorTest.class.getResourceAsStream( "/data/one-way-anova-parsed.txt" );
-        scores = new GeneScores( is, s, null, annotations );
-        is.close();
+            annotations = p.read( ism, Format.DEFAULT, s );
+
+            scores = new GeneScores( is, s, null, annotations );
+
+        }
     }
 
     @Test

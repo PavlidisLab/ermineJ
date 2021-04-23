@@ -16,6 +16,7 @@ package ubic.erminej.gui;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.zip.GZIPInputStream;
 
 import javax.swing.JFrame;
 import javax.swing.JTree;
@@ -23,15 +24,15 @@ import javax.swing.UIManager;
 
 import org.xml.sax.SAXException;
 
+import ubic.erminej.data.GOOBOParser;
 import ubic.erminej.data.GOParser;
-import ubic.erminej.data.GOXMLParser;
+import ubic.erminej.data.TestGOParser;
 import ubic.erminej.gui.geneset.tree.GeneSetTreeNode;
 
 /**
  * Not a 'real' test.
  *
  * @author Paul Pavlidis
- * @version $Id$
  */
 public class TreePanelApp {
     @SuppressWarnings("unused")
@@ -55,10 +56,8 @@ public class TreePanelApp {
      */
     public TreePanelApp() throws SAXException, IOException {
 
-        InputStream i =
-                // GOParser.class.getResourceAsStream("/data/go-termdb-sample.xml");
-                GOXMLParser.class.getResourceAsStream( "/data/go_daily-termdb.rdf-sample2.xml" );
-        gOParser = new GOXMLParser( i );
+        InputStream i = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/goslim_generic.obo.txt.gz" ) );
+        gOParser = new GOOBOParser( i );
         final JTree t = gOParser.getGraph().treeView( GeneSetTreeNode.class );
 
         // Create and set up the window.

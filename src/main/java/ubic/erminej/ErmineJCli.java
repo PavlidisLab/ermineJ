@@ -61,8 +61,8 @@ import ubic.erminej.data.GeneSetTerms;
 /**
  * Run ermineJ from the command line (or fire up the GUI).
  *
- * @author Paul Pavlidis
- * @author keshav
+ * @author  Paul Pavlidis
+ * @author  keshav
  * @version $Id: $Id
  */
 public class ErmineJCli {
@@ -77,7 +77,7 @@ public class ErmineJCli {
      * main.
      * </p>
      *
-     * @param args an array of {@link java.lang.String} objects.
+     * @param  args                an array of {@link java.lang.String} objects.
      * @throws java.lang.Exception if any.
      */
     public static void main( String[] args ) throws Exception {
@@ -185,8 +185,8 @@ public class ErmineJCli {
      * </p>
      *
      * @throws java.lang.IllegalArgumentException
-     * @throws java.io.IOException if any.
-     * @return a {@link ubic.erminej.analysis.GeneSetPvalRun} object.
+     * @throws java.io.IOException                if any.
+     * @return                                    a {@link ubic.erminej.analysis.GeneSetPvalRun} object.
      */
     protected GeneSetPvalRun analyze() throws IOException {
         statusMessenger.showProgress( "Starting analysis" );
@@ -256,11 +256,6 @@ public class ErmineJCli {
             statusMessenger.showStatus( "File reading or writing error during initialization: " + e.getMessage()
                     + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
             System.exit( 1 );
-        } catch ( SAXException e ) {
-            statusMessenger.showStatus( "Gene Ontology file format is incorrect. "
-                    + "\nPlease check that it is a valid XML or OBO file. "
-                    + "\nIf this problem persists, please contact the software developer. " + "\nPress OK to quit." );
-            System.exit( 1 );
         }
 
         statusMessenger.showStatus( "Done with initialization." );
@@ -283,9 +278,9 @@ public class ErmineJCli {
      * processCommandLine.
      * </p>
      *
-     * @param commandName a {@link java.lang.String} object.
-     * @param args an array of {@link java.lang.String} objects.
-     * @return a boolean.
+     * @param  commandName         a {@link java.lang.String} object.
+     * @param  args                an array of {@link java.lang.String} objects.
+     * @return                     a boolean.
      * @throws java.lang.Exception if any.
      */
     protected final boolean processCommandLine( String commandName, String[] args ) throws Exception {
@@ -325,9 +320,9 @@ public class ErmineJCli {
      * run.
      * </p>
      *
-     * @param args an array of {@link java.lang.String} objects.
-     * @throws IOException if any.
-     * @return a boolean.
+     * @param  args                an array of {@link java.lang.String} objects.
+     * @throws IOException         if any.
+     * @return                     a boolean.
      * @throws java.lang.Exception if any.
      */
     protected boolean run( String[] args ) throws Exception {
@@ -413,7 +408,7 @@ public class ErmineJCli {
         OptionBuilder.hasArg();
         OptionBuilder.withLongOpt( "classFile" );
         OptionBuilder
-                .withDescription( "Gene set ('class') file, e.g. GO file [XML or OBO; required unless using GUI]" );
+                .withDescription( "Gene set ('class') file, e.g. GO file [OBO format; required unless using GUI]" );
         OptionBuilder
                 .withArgName( "file" );
         options.addOption( OptionBuilder.create( 'c' ) );
@@ -884,7 +879,7 @@ public class ErmineJCli {
                             .println(
                                     "Please consider switching to the new command line style for this option (FDR or FWE)" );
                 } else {
-                    System.err.println(  "Multiple test correction must be FDR (Benjamini-Hochberg) or FWE (Bonferroni)" );
+                    System.err.println( "Multiple test correction must be FDR (Benjamini-Hochberg) or FWE (Bonferroni)" );
                     showHelp();
                     return false;
                 }

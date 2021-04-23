@@ -80,7 +80,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xml.sax.SAXException;
 
 import ubic.basecode.util.BrowserLauncher;
 import ubic.basecode.util.FileTools;
@@ -1343,10 +1342,7 @@ public class MainFrame extends JFrame {
         GeneSetTerms goData = null;
         try {
             goData = new GeneSetTerms( settings.getClassFile(), settings );
-        } catch ( SAXException e ) {
-            GuiUtil.error( "Gene Ontology file format is incorrect. "
-                    + "\nPlease check that it is a valid GO XML file." );
-            return;
+      
         } catch ( IOException e ) {
             GuiUtil.error( "Error during GO initialization: " + e.getMessage() );
             return;

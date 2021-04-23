@@ -30,7 +30,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.ZipInputStream;
 
 import javax.swing.table.TableModel;
 
@@ -38,14 +37,12 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.xml.sax.SAXException;
 
 import ubic.basecode.util.StatusStderr;
 import ubic.erminej.Settings;
 
 /**
  * @author pavlidis
- * @version $Id$
  */
 public class TestGeneAnnotations {
 
@@ -53,16 +50,10 @@ public class TestGeneAnnotations {
 
     @BeforeClass
     public static void before() {
-
-        try {
-            ZipInputStream z = new ZipInputStream(
-                    TestGeneAnnotations.class.getResourceAsStream( "/data/go_daily-termdb.rdf-xml.zip" ) );
-            z.getNextEntry();
-            goNames = new GeneSetTerms( z, false, false );
-            z.close();
+        try (InputStream i = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/goslim_generic.obo.txt.gz" ) )) {
+            goNames = new GeneSetTerms( i );
+            i.close();
         } catch ( IOException e ) {
-            e.printStackTrace();
-        } catch ( SAXException e ) {
             e.printStackTrace();
         }
 
@@ -71,10 +62,8 @@ public class TestGeneAnnotations {
     private GeneAnnotations ga;
     private List<Gene> geneIds;
     private List<Collection<GeneSetTerm>> goIds;
-    private InputStream ia;
     private InputStream imb;
 
-    private InputStream is;
     private List<String> elements;
 
     private Settings settings;
@@ -115,18 +104,17 @@ public class TestGeneAnnotations {
                 g.setAspect( "User-defined" );
         }
 
-        is = TestGeneAnnotations.class.getResourceAsStream( "/data/HG-U133_Plus_2_annot_sample.csv" );
         imb = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.sample-goidddelimittest.txt" );
-        ia = TestGeneAnnotations.class.getResourceAsStream( "/data/agilentannots.test.txt" );
 
-        InputStream im = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.sample.txt" );
+        try (InputStream im = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.sample.txt" )) {
 
-        GeneAnnotationParser p = new GeneAnnotationParser( goNames );
-        settings = new Settings( false );
-        settings.setUseUserDefined( false );
-        settings.setLoadUserDefined( false ); // important for test accuracy.
-        ga = p.readDefault( im, null, settings, false );
-        ga.setMessenger( new StatusStderr() );
+            GeneAnnotationParser p = new GeneAnnotationParser( goNames );
+            settings = new Settings( false );
+            settings.setUseUserDefined( false );
+            settings.setLoadUserDefined( false ); // important for test accuracy.
+            ga = p.readDefault( im, null, settings, false );
+            ga.setMessenger( new StatusStderr() );
+        }
 
     }
 
@@ -154,7 +142,7 @@ public class TestGeneAnnotations {
         GeneAnnotations pruned = new GeneAnnotations( ga, keepers );
         assertEquals( 4, pruned.numGenes() );
         assertEquals( 4, pruned.numProbes() );
-        assertEquals( 59, pruned.numGeneSets() ); // not checked by hand.
+        assertEquals( 6, pruned.numGeneSets() ); // not checked by hand.
     }
 
     @Test
@@ -184,8 +172,8 @@ public class TestGeneAnnotations {
 
     @Test
     public void testGetParents() {
-        GeneSetTerm t = ga.findTerm( "GO:0042246" );
-        GeneSetTerm p = ga.findTerm( "GO:0048589" );
+        GeneSetTerm t = ga.findTerm( "GO:0031410" );
+        GeneSetTerm p = ga.findTerm( "GO:0043226" );
 
         assertNotNull( t );
         assertNotNull( p );
@@ -197,95 +185,38 @@ public class TestGeneAnnotations {
 
     @Test
     public void testGoNames() {
-        // http://amigo.geneontology.org/amigo/term/GO:0005739 - "mitochondrion"
-        GeneSetTerm cellComp = goNames.get( "GO:0005739" );
-        assertNotNull( cellComp );
-        assertEquals( "cellular_component", cellComp.getAspect() );
-        GeneSetTerm term = new GeneSetTerm( "GO:0005739" );
+
+        //     GO:0008150: biological_process
+        //        GO:0006810: transport
+        //            GO:0006913: nucleocytoplasmic transport
+        //            GO:0007034: vacuolar transport
+        //            GO:0015031: protein transport
+        //                GO:0006605: protein targeting
+        //            GO:0016192: vesicle-mediated transport
+        //            GO:0030705: cytoskeleton-dependent intracellular transport
+        //            GO:0055085: transmembrane transport
+
+        GeneSetTerm c = goNames.get( "GO:0006810" );
+        assertNotNull( c );
+        assertEquals( "biological_process", c.getAspect() );
+        GeneSetTerm term = new GeneSetTerm( "GO:0015031" );
         Set<GeneSetTerm> children = goNames.getChildren( term );
-        assertEquals( 3, children.size() );
-        assertTrue( children.contains( new GeneSetTerm( "GO:0016007" ) ) );
+        assertEquals( 1, children.size() );
+        assertTrue( children.contains( new GeneSetTerm( "GO:0006605" ) ) );
 
-        Set<GeneSetTerm> allC = goNames.getAllChildren( term );
-        assertEquals( 78, allC.size() ); // have not checked this by hand, but mitochondrion part has a lot.
+        Set<GeneSetTerm> allC = goNames.getAllChildren( new GeneSetTerm( "GO:0006810" ) );
+        assertEquals( 7, allC.size() );
 
-        assertTrue( allC.contains( new GeneSetTerm( "GO:0005751" ) ) ); // few steps down.
+        assertTrue( allC.contains( new GeneSetTerm( "GO:0030705" ) ) );
 
         Collection<GeneSetTerm> parents = goNames.getParents( term );
-        assertEquals( 2, parents.size() );
-        assertTrue( parents.contains( new GeneSetTerm( "GO:0043231" ) ) );
-        assertEquals( "A semiautonomous, self replicating organelle that occurs"
-                + " in varying numbers, shapes, and sizes in the cytoplasm"
-                + " of virtually all eukaryotic cells. It is notably the site of tissue respiration.",
-                cellComp.getDefinition() );
-    }
-
-    @Test
-    @Deprecated
-    public final void testReadAffyCsv() throws Exception {
-        GeneAnnotationParser p = new GeneAnnotationParser( goNames, null );
-        GeneAnnotations g = p.readAffyCsv( is, null, settings );
-        Collection<GeneSetTerm> geneSets = g.getGeneSetTerms();
-        assertTrue( geneSets.size() > 0 );
-    }
-
-    /**
-     * Updated format @
-     */
-    @Test
-    @Deprecated
-    public final void testReadAffyCsv2() throws Exception {
-        // second affytest
-        GZIPInputStream isa = new GZIPInputStream(
-                TestGeneAnnotations.class
-                        .getResourceAsStream( "/data/MoGene-1_0-st-v1.na31.mm9.transcript.sample.txt.gz" ) );
-        GeneAnnotationParser p = new GeneAnnotationParser( goNames, null );
-        GeneAnnotations g = p.readAffyCsv( isa, null, settings );
-        Collection<GeneSetTerm> geneSets = g.getGeneSetTerms();
-        assertTrue( geneSets.size() > 0 );
-    }
-
-    @Test
-    @Deprecated
-    public final void testReadAffyCsv3() throws Exception {
-        // second affytest
-        InputStream isa = TestGeneAnnotations.class.getResourceAsStream( "/data/HG-U95A.affy.2011format.sample.csv" );
-        GeneAnnotationParser p = new GeneAnnotationParser( goNames, null );
-        GeneAnnotations g = p.readAffyCsv( isa, null, settings );
-        Collection<GeneSetTerm> geneSets = g.getGeneSetTerms();
-        assertTrue( geneSets.size() > 0 );
-
-        // note that many terms in the file get pruned or collapsed.
-        GeneSetTerm findTerm = g.findTerm( "GO:0044428" );
-        assertNotNull( findTerm );
-
-        GeneSetTerm term = new GeneSetTerm( "GO:0044428" );
-        assertTrue( geneSets.contains( term ) );
-        Collection<Gene> geneSetGenes = g.getGeneSetGenes( term );
-        assertTrue( geneSetGenes.size() > 0 );
-    }
-
-    @Test
-    @Deprecated
-    public void testReadAgilent() throws Exception {
-        GeneAnnotationParser p = new GeneAnnotationParser( goNames );
-        GeneAnnotations g = p.readAgilent( ia, null, settings );
-        int actualValue = g.findElement( "A_52_P311491" ).getGeneSets().size();
-        assertEquals( 12, actualValue ); // not checked by hand.
-    }
-
-    @Test
-    @Deprecated
-    public void testReadAgilent2012() throws Exception {
-        GeneAnnotationParser p = new GeneAnnotationParser( goNames );
-        InputStream a = TestGeneAnnotations.class.getResourceAsStream( "/data/agilentannots.test2012.txt" );
-        GeneAnnotations g = p.readAgilent( a, null, settings );
-        assertEquals( 37, g.getProbes().size() );
-        assertEquals( 30, g.getGenes().size() ); // not checked by hand.
-        Element testp = g.findElement( "A_84_P22735" );
-        assertNotNull( testp );
-        int actualValue = testp.getGeneSets().size();
-        assertEquals( 23, actualValue ); // not checked by hand.
+        assertEquals( 1, parents.size() );
+        assertTrue( parents.contains( new GeneSetTerm( "GO:0006810" ) ) );
+        assertEquals(
+                "The directed movement of substances (such as macromolecules, small molecules, ions) "
+                        + "or cellular components (such as complexes and organelles) into, out of or within a cell, or between cells, "
+                        + "or within a multicellular organism by means of some agent such as a transporter, pore or motor protein.",
+                c.getDefinition() );
     }
 
     @Test
@@ -296,7 +227,7 @@ public class TestGeneAnnotations {
         Element probe = g.findElement( "32304_at" );
         assertEquals( "PRKCA", probe.getGene().getSymbol() );
 
-        int expectedValue = 113; // not checked by hand.
+        int expectedValue = 5; // not checked by hand.
         int actualValue = probe.getGeneSets().size();
         assertEquals( expectedValue, actualValue );
     }
@@ -357,14 +288,15 @@ public class TestGeneAnnotations {
 
     @Test
     public void testSimple() throws Exception {
-        InputStream i = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.simpletest.txt" );
-        GeneAnnotationParser p = new GeneAnnotationParser( goNames );
-        GeneAnnotations r = p.readDefault( i, null, settings, true );
-        assertEquals( 9, r.getGenes().size() );
+        try (InputStream i = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.simpletest.txt" )) {
+            GeneAnnotationParser p = new GeneAnnotationParser( goNames );
+            GeneAnnotations r = p.readDefault( i, null, settings, true );
+            assertEquals( 9, r.getGenes().size() );
 
-        Gene g = r.findGene( "TAH1" );
-        assertNotNull( g );
-        assertTrue( g.getGeneSets().contains( new GeneSetTerm( "GO:0005737" ) ) );
+            Gene g = r.findGene( "TAH1" );
+            assertNotNull( g );
+            assertTrue( g.getGeneSets().contains( new GeneSetTerm( "GO:0005737" ) ) );
+        }
     }
 
     /**
@@ -372,35 +304,14 @@ public class TestGeneAnnotations {
      */
     @Test
     public void testSimpleMinSize() throws Exception {
-        InputStream i = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.simpletest.txt" );
-        GeneAnnotationParser p = new GeneAnnotationParser( goNames );
-        settings.setProperty( "minimum.geneset.size", 1 );
+        try (InputStream i = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.simpletest.txt" )) {
+            GeneAnnotationParser p = new GeneAnnotationParser( goNames );
+            settings.setProperty( "minimum.geneset.size", 1 );
 
-        GeneAnnotations r = p.readDefault( i, null, settings, true );
-        assertEquals( 9, r.getGenes().size() );
-
-    }
-
-    @Test
-    public void testSimpleOldGo() throws Exception {
-        InputStream i = TestGeneAnnotations.class.getResourceAsStream( "/data/geneAnnotation.simpletest.txt" );
-
-        InputStream z = new GZIPInputStream(
-                TestGeneAnnotations.class.getResourceAsStream( "/data/go_200109-termdb.xml.gz" ) );
-        GeneSetTerms go = new GeneSetTerms( z, true, false );
-
-        for ( GeneSetTerm g : go.getTerms() ) {
-            if ( g.getId().equals( "GO:0003673" ) ) continue;
-            assertNotNull( g.toString(), g.getAspect() );
+            GeneAnnotations r = p.readDefault( i, null, settings, true );
+            assertEquals( 9, r.getGenes().size() );
         }
 
-        GeneAnnotationParser p = new GeneAnnotationParser( go );
-        GeneAnnotations r = p.readDefault( i, null, settings, true );
-        assertEquals( 9, r.getGenes().size() );
-
-        Gene g = r.findGene( "TAH1" );
-        assertNotNull( g );
-        assertTrue( g.getGeneSets().contains( new GeneSetTerm( "GO:0005737" ) ) );
     }
 
     @Test
