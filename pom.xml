@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>ermineJ</groupId>
 	<artifactId>ermineJ</artifactId>
 	<name>ermineJ</name>
-	<version>3.2-SNAPSHOT</version>
+	<version>3.2</version>
 	<organization>
 		<name>UBC Michael Smith Laboratories</name>
 		<url>http://www.msl.ubc.ca</url>
@@ -21,7 +20,7 @@
 		<url>https://github.com/PavlidisLab/ermineJ</url>
 		<connection>scm:git:https://github.com/PavlidisLab/ermineJ.git</connection>
 		<developerConnection>scm:git:https://github.com/PavlidisLab/ermineJ.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>ermineJ-3.2</tag>
 	</scm>
 	<issueManagement>
 		<system>GitHub</system>
