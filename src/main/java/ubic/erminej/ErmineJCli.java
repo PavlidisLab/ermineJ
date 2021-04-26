@@ -43,7 +43,6 @@ import org.apache.commons.configuration.ConfigurationException;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xml.sax.SAXException;
 
 import ubic.basecode.util.FileTools;
 import ubic.basecode.util.StatusStderr;
@@ -63,11 +62,10 @@ import ubic.erminej.data.GeneSetTerms;
  *
  * @author  Paul Pavlidis
  * @author  keshav
- * @version $Id: $Id
  */
 public class ErmineJCli {
 
-    private static final String FOOTER = "ermineJ, Copyright (c) 2006-2018 University of British Columbia.\nFor more help go to http://erminej.msl.ubc.ca/";
+    private static final String FOOTER = "ermineJ, Copyright (c) 2006-2021 University of British Columbia.\nFor more help go to https://erminej.msl.ubc.ca/";
     private static final String HEADER = "Options:";
 
     private static Log log = LogFactory.getLog( ErmineJCli.class );

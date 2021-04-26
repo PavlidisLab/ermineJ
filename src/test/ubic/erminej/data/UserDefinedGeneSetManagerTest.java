@@ -42,9 +42,8 @@ public class UserDefinedGeneSetManagerTest {
 
     @Before
     public void setUp() throws Exception {
-
-        InputStream ism = UserDefinedGeneSetManagerTest.class.getResourceAsStream( "/data/HG-U95A.an.txt" );
-        try (InputStream is = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/goslim_generic.obo.txt.gz" ) )) {
+        try (InputStream ism = UserDefinedGeneSetManagerTest.class.getResourceAsStream( "/data/HG-U95A.an.txt" );
+                InputStream is = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/goslim_generic.obo.txt.gz" ) )) {
 
             GeneSetTerms gonames = new GeneSetTerms( is );
             GeneAnnotationParser p = new GeneAnnotationParser( gonames );

@@ -37,7 +37,7 @@ import ubic.erminej.ResultsPrinter;
 import ubic.erminej.data.GeneSetResult;
 
 /**
- * @author pavlidis
+ * @author  pavlidis
  * @version $Id$
  */
 public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
@@ -125,31 +125,31 @@ public class OraPvalGeneratorTest extends AbstractPvalGeneratorTest {
         ResultsPrinter.write( tmp.getAbsolutePath(), results, false );
 
         FileReader fr = new FileReader( tmp );
-        BufferedReader br = new BufferedReader( fr );
-        boolean found1 = false;
-        boolean found2 = false;
-        boolean found3 = false;
+        try (BufferedReader br = new BufferedReader( fr )) {
+            boolean found1 = false;
+            boolean found2 = false;
+            boolean found3 = false;
 
-        while ( br.ready() ) {
-            String line = br.readLine();
-            if ( line.startsWith( "numAboveThreshold" ) ) {
-                found1 = true;
-            } else if ( line.startsWith( "maxClassSize" ) ) {
-                found2 = true;
-            } else if ( line.startsWith( "useUserDefinedGroups" ) ) {
-                found3 = true;
+            while ( br.ready() ) {
+                String line = br.readLine();
+                if ( line.startsWith( "numAboveThreshold" ) ) {
+                    found1 = true;
+                } else if ( line.startsWith( "maxClassSize" ) ) {
+                    found2 = true;
+                } else if ( line.startsWith( "useUserDefinedGroups" ) ) {
+                    found3 = true;
+                }
+
+                // System.err.println( line );
             }
 
-            // System.err.println( line );
+            assertTrue( found1 && found2 && found3 );
+
+            Collection<GeneSetPvalRun> loadedresults = ResultsFileReader.load( this.annotations, tmp.getAbsolutePath(),
+                    null );
+
+            assertEquals( 1, loadedresults.size() );
         }
-
-        assertTrue( found1 && found2 && found3 );
-
-        Collection<GeneSetPvalRun> loadedresults = ResultsFileReader.load( this.annotations, tmp.getAbsolutePath(),
-                null );
-
-        assertEquals( 1, loadedresults.size() );
-
     }
 
 }

@@ -330,29 +330,28 @@ public class StartupPanel extends JPanel {
 
                     InputStream inputStream = new BufferedInputStream( urlPattern.openStream() );
 
-                    OutputStream outputStream = new FileOutputStream( new File( outputFilePath ) );
+                    try (OutputStream outputStream = new FileOutputStream( new File( outputFilePath ) );) {
 
-                    final byte[] buffer = new byte[65536];
-                    int read = -1;
-                    int totalRead = 0;
+                        final byte[] buffer = new byte[65536];
+                        int read = -1;
+                        int totalRead = 0;
 
-                    StopWatch timer = new StopWatch();
-                    timer.start();
-                    while ( ( read = inputStream.read( buffer ) ) > -1 ) {
-                        outputStream.write( buffer, 0, read );
-                        totalRead += read;
-                        if ( timer.getTime() > 500 ) {
-                            statusMessenger.showProgress( "Annotations: " + totalRead + " bytes read" );
-                            timer.reset();
-                            timer.start();
+                        StopWatch timer = new StopWatch();
+                        timer.start();
+                        while ( ( read = inputStream.read( buffer ) ) > -1 ) {
+                            outputStream.write( buffer, 0, read );
+                            totalRead += read;
+                            if ( timer.getTime() > 500 ) {
+                                statusMessenger.showProgress( "Annotations: " + totalRead + " bytes read" );
+                                timer.reset();
+                                timer.start();
+                            }
                         }
+                        statusMessenger.showStatus( "Annotations: " + totalRead + " bytes read" );
+
+                        outputStream.close();
                     }
-                    statusMessenger.showStatus( "Annotations: " + totalRead + " bytes read" );
-
-                    outputStream.close();
-
-                    try {
-                        GZIPInputStream gf = new GZIPInputStream( new FileInputStream( new File( outputFilePath ) ) );
+                    try (GZIPInputStream gf = new GZIPInputStream( new FileInputStream( new File( outputFilePath ) ) );) {
                         gf.read();
                     } catch ( IOException e ) {
                         annotFileTextField.setText( "" );
@@ -405,19 +404,19 @@ public class StartupPanel extends JPanel {
                     InputStream inputStream = new BufferedInputStream( urlPattern.openStream() );
                     String localGoFileName = testPath;
 
-                    OutputStream outputStream = new FileOutputStream( new File( localGoFileName ) );
+                    try (OutputStream outputStream = new FileOutputStream( new File( localGoFileName ) )) {
 
-                    final byte[] buffer = new byte[65536];
-                    int read = -1;
-                    int totalRead = 0;
+                        final byte[] buffer = new byte[65536];
+                        int read = -1;
+                        int totalRead = 0;
 
-                    while ( ( read = inputStream.read( buffer ) ) > -1 ) {
-                        outputStream.write( buffer, 0, read );
-                        totalRead += read;
-                        statusMessenger.showProgress( "GO: " + totalRead + " bytes read ..." );
+                        while ( ( read = inputStream.read( buffer ) ) > -1 ) {
+                            outputStream.write( buffer, 0, read );
+                            totalRead += read;
+                            statusMessenger.showProgress( "GO: " + totalRead + " bytes read ..." );
+                        }
+                        outputStream.close();
                     }
-                    outputStream.close();
-
                     statusMessenger.clear();
 
                     settings.setClassFile( localGoFileName );

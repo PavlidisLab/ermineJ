@@ -930,9 +930,7 @@ public class MainFrame extends JFrame {
             return;
         }
 
-        try {
-
-            BufferedReader fis = new BufferedReader( new FileReader( logFile ) );
+        try ( BufferedReader fis = new BufferedReader( new FileReader( logFile ) )){         
             String line;
             while ( ( line = fis.readLine() ) != null ) {
                 bif.append( line );
@@ -1336,8 +1334,9 @@ public class MainFrame extends JFrame {
         timer.start();
         updateProgress( 10 );
 
-        statusMessenger.showProgress( "Reading GO hierarchy from: " + settings.getClassFile() );
         assert settings.getClassFile() != null;
+        
+        statusMessenger.showProgress( "Reading GO hierarchy from OBO file: " + settings.getClassFile() );
 
         GeneSetTerms goData = null;
         try {

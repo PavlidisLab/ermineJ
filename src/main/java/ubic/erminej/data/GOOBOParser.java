@@ -38,6 +38,10 @@ import ubic.basecode.dataStructure.graph.DirectedGraph;
  */
 public class GOOBOParser extends GOParser {
 
+    /**
+     * 
+     */
+    private static final String OBO_HEADER_PREFIX = "format-version";
     private static Logger log = LoggerFactory.getLogger( GOOBOParser.class );
 
     /**
@@ -56,6 +60,12 @@ public class GOOBOParser extends GOParser {
 
         BufferedReader in = new BufferedReader( new InputStreamReader( i ) );
         String line = null;
+
+        line = in.readLine();
+        if ( !line.startsWith( OBO_HEADER_PREFIX ) ) {
+            throw new IllegalArgumentException( "GO file format not recognized. Note: only OBO is supported; "
+                    + "if you need to use the old XML forma,t use ErmineJ versions prior to 3.2" );
+        }
 
         GeneSetTerm currentTerm = null;
         while ( ( line = in.readLine() ) != null ) {
@@ -141,6 +151,10 @@ public class GOOBOParser extends GOParser {
         this.getGraph().addParentTo( "GO:0005575", ALL );
 
         populateAspect();
+
+        if ( this.getGraph().getItems().size() < 2 ) {
+            throw new IllegalStateException( "File format problem? Only " + this.getGraph().getItems().size() + " GO terms found!" );
+        }
     }
 
     /**
