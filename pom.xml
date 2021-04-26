@@ -4,7 +4,7 @@
 	<groupId>ermineJ</groupId>
 	<artifactId>ermineJ</artifactId>
 	<name>ermineJ</name>
-	<version>3.2</version>
+	<version>3.2.1-SNAPSHOT</version>
 	<organization>
 		<name>UBC Michael Smith Laboratories</name>
 		<url>http://www.msl.ubc.ca</url>
@@ -20,7 +20,7 @@
 		<url>https://github.com/PavlidisLab/ermineJ</url>
 		<connection>scm:git:https://github.com/PavlidisLab/ermineJ.git</connection>
 		<developerConnection>scm:git:https://github.com/PavlidisLab/ermineJ.git</developerConnection>
-		<tag>ermineJ-3.2</tag>
+		<tag>HEAD</tag>
 	</scm>
 	<issueManagement>
 		<system>GitHub</system>
