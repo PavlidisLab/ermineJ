@@ -496,6 +496,7 @@
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-enforcer-plugin</artifactId>
 			</plugin>
+			<!--
 			<plugin>
 				<groupId>sh.tak.appbundler</groupId>
 				<artifactId>appbundle-maven-plugin</artifactId>
@@ -503,7 +504,7 @@
 				<configuration>
 					<mainClass>ubic.erminej.ErmineJGui</mainClass>
 					<generateDiskImageFile>true</generateDiskImageFile>
-					<iconFile>icon.icns</iconFile> <!-- in src/main/resources, other paths not supported? -->
+					<iconFile>icon.icns</iconFile> in src/main/resources, other paths not supported?
 					<jvmOptions>-Xmx3g</jvmOptions>
 				</configuration>
 				<executions>
@@ -514,7 +515,7 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin>
+			</plugin> -->
 			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>osxappbundle-maven-plugin</artifactId> <version>1.0-alpha-2</version>
 				<configuration> <bundleName>ermineJ</bundleName> <mainClass>ubic.erminej.ErmineJGui</mainClass> <javaApplicationStub>${basedir}/src/main/osx/JavaApplicationStub</javaApplicationStub>
 				<jvmVersion>1.8+</jvmVersion> <vmOptions>-Xmx3g</vmOptions> <iconFile>${basedir}/src/main/osx/icon.icns</iconFile> </configuration>
@@ -631,9 +632,9 @@
 							<goal>single</goal>
 						</goals>
 						<configuration>
-							<descriptors>
-								<descriptor>src/main/assembly/bin-assembly.xml</descriptor>
-							</descriptors>
+							<descriptorRefs>
+								<descriptorRef>bin</descriptorRef>
+							</descriptorRefs>
 						</configuration>
 					</execution>
 					<execution>
