@@ -23,6 +23,7 @@ import java.util.Comparator;
 
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.MutableTreeNode;
+import javax.swing.tree.TreeNode;
 
 import ubic.basecode.dataStructure.graph.DirectedGraphNode;
 import ubic.erminej.data.GeneSetTerm;
@@ -39,11 +40,11 @@ public class GeneSetTreeNode extends DefaultMutableTreeNode {
 
     private static final long serialVersionUID = 1L;
 
-    private static Comparator<GeneSetTreeNode> comparator = new Comparator<GeneSetTreeNode>() {
+    private static Comparator<TreeNode> comparator = new Comparator<TreeNode>() {
 
         @Override
-        public int compare( GeneSetTreeNode o1, GeneSetTreeNode o2 ) {
-            return o1.getTerm().getName().compareTo( o2.getTerm().getName() );
+        public int compare( TreeNode o1, TreeNode o2 ) {
+            return ( ( GeneSetTreeNode ) o1 ).getTerm().getName().compareTo( ( ( GeneSetTreeNode ) o2 ).getTerm().getName() );
         }
     };
 

@@ -557,9 +557,9 @@ public class GeneSetTreePanel extends GeneSetPanel {
      */
     private Collection<GeneSetTreeNode> getLeaves( GeneSetTreeNode node ) {
         Collection<GeneSetTreeNode> result = new HashSet<>();
-        Enumeration<GeneSetTreeNode> dfe = node.depthFirstEnumeration();
+        Enumeration<TreeNode> dfe = node.depthFirstEnumeration();
         while ( dfe.hasMoreElements() ) {
-            GeneSetTreeNode no = dfe.nextElement();
+            GeneSetTreeNode no = ( GeneSetTreeNode ) dfe.nextElement();
             if ( no.isLeaf() ) {
                 result.add( no );
             }
@@ -634,10 +634,10 @@ public class GeneSetTreePanel extends GeneSetPanel {
         /*
          * Reset all nodes
          */
-        Enumeration<GeneSetTreeNode> e = ( ( GeneSetTreeNode ) this.goTree.getModel().getRoot() )
-                .breadthFirstEnumeration();
+        Enumeration<TreeNode> e = ( ( GeneSetTreeNode ) this.goTree.getModel().getRoot() )
+            .breadthFirstEnumeration();
         while ( e.hasMoreElements() ) {
-            GeneSetTreeNode n = e.nextElement();
+            GeneSetTreeNode n = ( GeneSetTreeNode ) e.nextElement();
             n.setHasSelectedChild( false );
             n.setHasSignificantChild( false );
         }
