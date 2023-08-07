@@ -400,7 +400,7 @@
 				<exclusion>
 					<groupId>junit</groupId>
 					<artifactId>junit</artifactId>
-				</exclusion> 
+				</exclusion>
 			</exclusions>
 		</dependency>
 		<dependency>
@@ -435,25 +435,9 @@
 	</dependencies>
 	<repositories>
 		<repository>
-			<id>central</id>
-			<name>central</name>
-			<url>https://repo1.maven.org/maven2/</url>
-			<layout>default</layout>
-			<snapshots>
-				<enabled>false</enabled>
-				<updatePolicy>never</updatePolicy>
-			</snapshots>
-			<releases>
-				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
-			</releases>
-		</repository>
-		<repository>
 			<id>pavlab</id>
 			<name>PavLab</name>
-			<url>
-				https://maven2.pavlab.msl.ubc.ca/
-			</url>
+			<url>https://maven2.pavlab.msl.ubc.ca/</url>
 			<layout>default</layout>
 			<snapshots>
 				<enabled>true</enabled>
@@ -461,6 +445,7 @@
 			</snapshots>
 			<releases>
 				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
 			</releases>
 		</repository>
 	</repositories>
@@ -530,9 +515,9 @@
 					</execution>
 				</executions>
 			</plugin>
-			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>osxappbundle-maven-plugin</artifactId> <version>1.0-alpha-2</version> 
-				<configuration> <bundleName>ermineJ</bundleName> <mainClass>ubic.erminej.ErmineJGui</mainClass> <javaApplicationStub>${basedir}/src/main/osx/JavaApplicationStub</javaApplicationStub> 
-				<jvmVersion>1.8+</jvmVersion> <vmOptions>-Xmx3g</vmOptions> <iconFile>${basedir}/src/main/osx/icon.icns</iconFile> </configuration> 
+			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>osxappbundle-maven-plugin</artifactId> <version>1.0-alpha-2</version>
+				<configuration> <bundleName>ermineJ</bundleName> <mainClass>ubic.erminej.ErmineJGui</mainClass> <javaApplicationStub>${basedir}/src/main/osx/JavaApplicationStub</javaApplicationStub>
+				<jvmVersion>1.8+</jvmVersion> <vmOptions>-Xmx3g</vmOptions> <iconFile>${basedir}/src/main/osx/icon.icns</iconFile> </configuration>
 				</plugin> -->
 			<plugin>
 				<artifactId>maven-surefire-plugin</artifactId>
@@ -571,8 +556,8 @@
 				<artifactId>surefire-report-maven-plugin</artifactId>
 				<version>2.0-beta-1</version>
 			</plugin>
-			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>buildnumber-maven-plugin</artifactId> <executions> <execution> 
-				<phase>initialize</phase> <goals> <goal>create</goal> </goals> </execution> </executions> <configuration> <doCheck>false</doCheck> 
+			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>buildnumber-maven-plugin</artifactId> <executions> <execution>
+				<phase>initialize</phase> <goals> <goal>create</goal> </goals> </execution> </executions> <configuration> <doCheck>false</doCheck>
 				<doUpdate>false</doUpdate> <timestampFormat>{0, date, yyyy-MM-dd HH:mm:ss}</timestampFormat> </configuration> </plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
