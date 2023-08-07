@@ -702,38 +702,4 @@
 			</plugin>
 		</plugins>
 	</build>
-	<distributionManagement>
-		<repository>
-			<id>pavlabrepo</id>
-			<name>Pavlab</name>
-			<url>scpexe://willie.msl.ubc.ca/space/maven2</url>
-		</repository>
-	</distributionManagement>
-	<profiles>
-		<profile>
-			<!-- For deployment where host is local (and ssh isn't available for builder, e.g. CI) -->
-			<id>local-deploy</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-				<property>
-					<name>deploy.local</name>
-				</property>
-			</activation>
-			<distributionManagement>
-				<repository>
-					<id>repo</id>
-					<name>Pavlab</name>
-					<url>file:///space/maven2</url>
-				</repository>
-				<snapshotRepository>
-					<id>repo</id>
-					<name>Pavlab</name>
-					<url>file:///space/maven2</url>
-				</snapshotRepository>
-			</distributionManagement>
-		</profile>
-	</profiles>
-	<properties>
-		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-	</properties>
 </project>
