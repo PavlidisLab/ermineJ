@@ -1,7 +1,7 @@
 /*
  * The ermineJ project
  * 
- * Copyright (c) 2018 University of British Columbia
+ * Copyright (c) 2018-2021 University of British Columbia
  * 
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import ubic.basecode.dataStructure.graph.DirectedGraph;
-import ubic.basecode.dataStructure.graph.DirectedGraphNode;
 
 /**
  * 
@@ -39,11 +38,15 @@ import ubic.basecode.dataStructure.graph.DirectedGraphNode;
  */
 public class GOOBOParser extends GOParser {
 
+    /**
+     * 
+     */
+    private static final String OBO_HEADER_PREFIX = "format-version";
     private static Logger log = LoggerFactory.getLogger( GOOBOParser.class );
 
     /**
-     * @param i
-     * @param oldFormat if true, use the old-fashioned scheme
+     * @param  i
+     * @param  oldFormat   if true, use the old-fashioned scheme
      * @throws IOException
      */
     public GOOBOParser( InputStream i ) throws IOException {
@@ -57,6 +60,12 @@ public class GOOBOParser extends GOParser {
 
         BufferedReader in = new BufferedReader( new InputStreamReader( i ) );
         String line = null;
+
+        line = in.readLine();
+        if ( !line.startsWith( OBO_HEADER_PREFIX ) ) {
+            throw new IllegalArgumentException( "GO file format not recognized. Note: only OBO is supported; "
+                    + "if you need to use the old XML forma,t use ErmineJ versions prior to 3.2" );
+        }
 
         GeneSetTerm currentTerm = null;
         while ( ( line = in.readLine() ) != null ) {
@@ -73,9 +82,8 @@ public class GOOBOParser extends GOParser {
                 currentTerm = new GeneSetTerm( null, "[No name provided]", "[No definition]" );
 
             } else if ( line.equals( "[Typedef]" ) ) {
-                // not seeing this in current version, but GOTrack handles
+                // irrelevant
                 currentTerm = null;
-                continue;
             } else {
                 if ( currentTerm == null ) continue;
 
@@ -94,37 +102,40 @@ public class GOOBOParser extends GOParser {
                 } else if ( key.equals( "namespace" ) ) {
                     currentTerm.setAspect( value );
                 } else if ( key.equals( "def" ) ) {
-                    currentTerm.setDefinition( value );
+
+                    String def = value.replaceAll( "\\[.*\\]", "" ).trim(); // trim off stuff like [GOC:ai]
+                    def = def.replaceAll( "^\"", "" ).replaceAll( "\"$", "" ); // trim quotation marks
+
+                    currentTerm.setDefinition( def );
                 } else if ( key.equals( "is_a" ) ) {
-                    // quite sure this is right 
-
-                     //is_a: GO:0006886 ! intracellular protein transport
-
+                    //GO:0006886 ! intracellular protein transport
                     String parentTerm = StringUtils.split( value, " ", 2 )[0];
-
                     addRelationship( currentTerm, parentTerm );
                 } else if ( key.equals( "is_obsolete" ) ) {
                     this.termGraph.deleteLeaf( currentTerm.getId() );
                     currentTerm = null;
                     continue;
                 } else if ( key.equals( "relationship" ) ) {
-                    // pretty sure this is right...
+                    //  part_of GO:0006606 ! protein import into nucleus
 
-                    // relationship: part_of GO:0006606 ! protein import into nucleus
+                    /*
+                     * We shouldn't use these to define the DAG because "relationships" seem to add "extras".
+                     */
 
-                    String[] tv = StringUtils.split( value, " ", 2 );
-
-                    String relType = tv[0];
-                    String parentTerm = tv[1];
-                    if ( relType.equals( "part_of" ) || relType.equals( "is_a" ) ) {
-                        addRelationship( currentTerm, parentTerm );
-
-                    }
+                    //                    String[] tv = StringUtils.split( value, " ", 3 );
+                    //
+                    //                    String relType = tv[0];
+                    //                    String parentTerm = tv[1];
+                    //                    if ( relType.equals( "part_of" ) || relType.equals( "is_a" ) ) {
+                    //                        addRelationship( currentTerm, parentTerm );
+                    //                    }
                 } else if ( key.equals( "synonym" ) ) {
                     // no-op
                 } else if ( key.equals( "name" ) ) {
                     currentTerm.setName( value );
-                }
+                } else if ( key.equals( "subset" ) ) {
+                    // no-op
+                } // there are other possible fields but we just ignore them
 
             }
         }
@@ -140,6 +151,10 @@ public class GOOBOParser extends GOParser {
         this.getGraph().addParentTo( "GO:0005575", ALL );
 
         populateAspect();
+
+        if ( this.getGraph().getItems().size() < 2 ) {
+            throw new IllegalStateException( "File format problem? Only " + this.getGraph().getItems().size() + " GO terms found!" );
+        }
     }
 
     /**
@@ -152,6 +167,7 @@ public class GOOBOParser extends GOParser {
             termGraph.addNode( parentTerm, new GeneSetTerm( parentTerm ) );
         }
 
+        if ( log.isDebugEnabled() ) log.debug( "Adding parent " + parentTerm + " to " + currentTerm );
         this.termGraph.addParentTo( currentTerm.getId(), parentTerm );
 
     }

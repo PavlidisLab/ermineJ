@@ -18,7 +18,7 @@ package ubic.erminej.data;
 /**
  * Represents a GO term (most commonly) or other way of grouping genes.
  *
- * @author pavlidis
+ * @author  pavlidis
  * @version $Id$
  */
 public class GeneSetTerm implements Comparable<GeneSetTerm> {
@@ -58,7 +58,7 @@ public class GeneSetTerm implements Comparable<GeneSetTerm> {
      * Constructor for GeneSetTerm.
      * </p>
      *
-     * @param id a {@link java.lang.String} object.
+     * @param id   a {@link java.lang.String} object.
      * @param name a {@link java.lang.String} object.
      */
     public GeneSetTerm( String id, String name ) {
@@ -71,9 +71,9 @@ public class GeneSetTerm implements Comparable<GeneSetTerm> {
      * Constructor for GeneSetTerm.
      * </p>
      *
-     * @param id a {@link java.lang.String} object.
+     * @param id   a {@link java.lang.String} object.
      * @param name a {@link java.lang.String} object.
-     * @param def a {@link java.lang.String} object.
+     * @param def  a {@link java.lang.String} object.
      */
     public GeneSetTerm( String id, String name, String def ) {
         this( id, name );
@@ -198,7 +198,7 @@ public class GeneSetTerm implements Comparable<GeneSetTerm> {
         else if ( this.aspect.equals( aspect ) )
             return;
         else
-            throw new IllegalArgumentException( "Attempt to change aspect of " + this.getId() );
+            throw new IllegalArgumentException( "Attempt to change aspect of " + this.getId() + " from " + this.aspect + " to " + aspect );
     }
 
     /**

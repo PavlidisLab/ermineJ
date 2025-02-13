@@ -33,7 +33,6 @@ import ubic.erminej.data.GeneSetTerms;
 
 /**
  * @author paul
- * @version $Id$
  */
 public class ScoreQuantileTest {
 
@@ -43,16 +42,17 @@ public class ScoreQuantileTest {
     public void setUp() throws Exception {
         SettingsHolder s = new Settings( false );
 
-        InputStream is = GeneScoreReaderTest.class.getResourceAsStream( "/data/test.scores.txt" );
+        try (InputStream is = GeneScoreReaderTest.class.getResourceAsStream( "/data/test.scores.txt" );
 
-        InputStream ism = GeneScoreReaderTest.class.getResourceAsStream( "/data/test.an.txt" );
+                InputStream ism = GeneScoreReaderTest.class.getResourceAsStream( "/data/test.an.txt" )) {
 
-        GeneSetTerms geneSetTerms = new GeneSetTerms(
-                GeneScoreReaderTest.class.getResourceAsStream( "/data/go-termdb-test.xml" ), false, false );
-        GeneAnnotationParser p = new GeneAnnotationParser( geneSetTerms );
-        GeneAnnotations g = p.readDefault( ism, null, s, false );
+            GeneSetTerms geneSetTerms = new GeneSetTerms(
+                    GeneScoreReaderTest.class.getResourceAsStream( "/data/go-termdb-test.xml" ), true );
+            GeneAnnotationParser p = new GeneAnnotationParser( geneSetTerms );
+            GeneAnnotations g = p.readDefault( ism, null, s, false );
 
-        test = new GeneScores( is, s, null, g );
+            test = new GeneScores( is, s, null, g );
+        }
 
     }
 

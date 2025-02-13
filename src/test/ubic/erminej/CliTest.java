@@ -29,7 +29,6 @@ import org.junit.Test;
  * Tests of command line - mostly just parsing, actual analysis not always run.
  *
  * @author paul
- * @version $Id$
  */
 public class CliTest {
 
@@ -41,7 +40,7 @@ public class CliTest {
 
     @Before
     public final void setUp() throws Exception {
-        URL go = this.getClass().getResource( "/data/go_daily-termdb.rdf-xml.zip" );
+        URL go = this.getClass().getResource( "/data/goslim_generic.obo.txt.gz" );
         File f = new File( go.toURI() );
         gofile = f.getAbsolutePath();
         basePath = f.getParentFile().getAbsolutePath();
@@ -108,20 +107,20 @@ public class CliTest {
 
         File file = new File( output );
 
-        BufferedReader f = new BufferedReader( new FileReader( file ) );
+        try (BufferedReader f = new BufferedReader( new FileReader( file ) )) {
 
-        String line = "";
-        boolean found = false;
-        // TODO do better test of output.
-        while ( ( line = f.readLine() ) != null ) {
-            // System.err.println( line );
-            if ( line.contains( "GO:0008061" ) ) {
-                assertTrue( line.contains( "0.3039054" ) );
-                found = true;
+            String line = "";
+            boolean found = false;
+            // TODO do better test of output.
+            while ( ( line = f.readLine() ) != null ) {
+               // System.out.println( ">>> " + line );
+                if ( line.contains( "GO:0006914" ) ) {
+                    assertTrue( line.contains( "0.1734648" ) );
+                    found = true;
+                }
             }
+            assertTrue( found );
         }
-        assertTrue( found );
-
     }
 
     /**

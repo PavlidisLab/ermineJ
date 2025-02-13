@@ -37,7 +37,7 @@ import ubic.erminej.data.GeneSetTerm;
 import ubic.erminej.data.GeneSetTerms;
 
 /**
- * @author pavlidis
+ * @author  pavlidis
  * @version $Id$
  */
 public abstract class AbstractPvalGeneratorTest {
@@ -76,7 +76,7 @@ public abstract class AbstractPvalGeneratorTest {
         s.setAnnotFile( AbstractPvalGeneratorTest.class.getResource( "/data/test.an.txt" ).getFile() );
         s.setClassFile( AbstractPvalGeneratorTest.class.getResource( "/data/go-termdb-test.xml" ).getFile() );
 
-        gon = new GeneSetTerms( isi, false, false );
+        gon = new GeneSetTerms( isi, true );
         GeneAnnotationParser p = new GeneAnnotationParser( gon );
         annotations = p.read( ism, Format.DEFAULT, s );
 

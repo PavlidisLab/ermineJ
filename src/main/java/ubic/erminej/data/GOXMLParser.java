@@ -34,8 +34,9 @@ import org.xml.sax.helpers.XMLReaderFactory;
 import ubic.basecode.dataStructure.graph.DirectedGraph;
 
 /**
- * Read in the GO XML file provided by the Gene Ontology Consortium.
- *
+ * Read in the GO XML file provided by the Gene Ontology Consortium. Only kept for compatibility of some old tests that
+ * would be a pain to rewrite!
+ * 
  * @author Paul Pavlidis
  */
 public class GOXMLParser extends GOParser {
@@ -45,8 +46,8 @@ public class GOXMLParser extends GOParser {
     }
 
     /**
-     * @param i
-     * @param oldFormat if true, use the old-fashioned scheme
+     * @param  i
+     * @param  oldFormat    if true, use the old-fashioned scheme
      * @throws IOException
      * @throws SAXException
      */

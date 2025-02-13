@@ -1,16 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<parent>
-		<groupId>ubc.pavlab</groupId>
-		<artifactId>pavlab-starter-parent</artifactId>
-		<version>1.2.15</version>
-	</parent>
 	<groupId>ermineJ</groupId>
 	<artifactId>ermineJ</artifactId>
 	<name>ermineJ</name>
-	<version>3.1.3-SNAPSHOT</version>
+	<version>3.2</version>
 	<organization>
 		<name>UBC Michael Smith Laboratories</name>
 		<url>http://www.msl.ubc.ca</url>
@@ -26,7 +20,7 @@
 		<url>https://github.com/PavlidisLab/ermineJ</url>
 		<connection>scm:git:https://github.com/PavlidisLab/ermineJ.git</connection>
 		<developerConnection>scm:git:https://github.com/PavlidisLab/ermineJ.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>ermineJ-3.2</tag>
 	</scm>
 	<issueManagement>
 		<system>GitHub</system>
@@ -54,12 +48,13 @@
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
+			<version>4.13.1</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>baseCode</groupId>
 			<artifactId>baseCode</artifactId>
-			<version>1.0.23</version>
+			<version>1.0.29</version>
 			<type>jar</type>
 			<exclusions>
 				<exclusion>
@@ -171,7 +166,7 @@
 		<dependency>
 			<groupId>gemma</groupId>
 			<artifactId>gemma-core</artifactId>
-			<version>1.22.1</version>
+			<version>1.26.4</version>
 			<type>jar</type>
 			<exclusions>
 				<exclusion>
@@ -405,14 +400,14 @@
 				<exclusion>
 					<groupId>junit</groupId>
 					<artifactId>junit</artifactId>
-				</exclusion>
+				</exclusion> 
 			</exclusions>
 		</dependency>
 		<dependency>
 			<!-- needed for commons-configuration builders -->
 			<groupId>commons-beanutils</groupId>
 			<artifactId>commons-beanutils</artifactId>
-			<version>1.8.3</version>
+			<version>1.9.2</version>
 		</dependency>
 		<dependency>
 			<groupId>forehead</groupId>
@@ -440,9 +435,25 @@
 	</dependencies>
 	<repositories>
 		<repository>
+			<id>central</id>
+			<name>central</name>
+			<url>https://repo1.maven.org/maven2/</url>
+			<layout>default</layout>
+			<snapshots>
+				<enabled>false</enabled>
+				<updatePolicy>never</updatePolicy>
+			</snapshots>
+			<releases>
+				<enabled>true</enabled>
+				<updatePolicy>never</updatePolicy>
+			</releases>
+		</repository>
+		<repository>
 			<id>pavlab</id>
 			<name>PavLab</name>
-			<url>https://maven2.pavlab.msl.ubc.ca/</url>
+			<url>
+				https://maven2.pavlab.msl.ubc.ca/
+			</url>
 			<layout>default</layout>
 			<snapshots>
 				<enabled>true</enabled>
@@ -450,7 +461,6 @@
 			</snapshots>
 			<releases>
 				<enabled>true</enabled>
-				<updatePolicy>never</updatePolicy>
 			</releases>
 		</repository>
 	</repositories>
@@ -494,9 +504,13 @@
 		<plugins>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-enforcer-plugin</artifactId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.5.1</version>
+				<configuration>
+					<source>1.8</source>
+					<target>1.8</target>
+				</configuration>
 			</plugin>
-			<!--
 			<plugin>
 				<groupId>sh.tak.appbundler</groupId>
 				<artifactId>appbundle-maven-plugin</artifactId>
@@ -504,8 +518,8 @@
 				<configuration>
 					<mainClass>ubic.erminej.ErmineJGui</mainClass>
 					<generateDiskImageFile>true</generateDiskImageFile>
-					<iconFile>icon.icns</iconFile> in src/main/resources, other paths not supported?
-					<jvmOptions>-Xmx3g</jvmOptions>
+					<iconFile>icon.icns</iconFile> <!-- in src/main/resources, other paths not supported? -->
+					<vmOptions>-Xmx3g</vmOptions>
 				</configuration>
 				<executions>
 					<execution>
@@ -515,14 +529,14 @@
 						</goals>
 					</execution>
 				</executions>
-			</plugin> -->
-			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>osxappbundle-maven-plugin</artifactId> <version>1.0-alpha-2</version>
-				<configuration> <bundleName>ermineJ</bundleName> <mainClass>ubic.erminej.ErmineJGui</mainClass> <javaApplicationStub>${basedir}/src/main/osx/JavaApplicationStub</javaApplicationStub>
-				<jvmVersion>1.8+</jvmVersion> <vmOptions>-Xmx3g</vmOptions> <iconFile>${basedir}/src/main/osx/icon.icns</iconFile> </configuration>
+			</plugin>
+			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>osxappbundle-maven-plugin</artifactId> <version>1.0-alpha-2</version> 
+				<configuration> <bundleName>ermineJ</bundleName> <mainClass>ubic.erminej.ErmineJGui</mainClass> <javaApplicationStub>${basedir}/src/main/osx/JavaApplicationStub</javaApplicationStub> 
+				<jvmVersion>1.8+</jvmVersion> <vmOptions>-Xmx3g</vmOptions> <iconFile>${basedir}/src/main/osx/icon.icns</iconFile> </configuration> 
 				</plugin> -->
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.8.1</version>
 				<configuration>
 					<argLine>-enableassertions -Xmx512m -Djava.awt.headless=true</argLine>
 					<reportsDirectory>target/surefire-reports</reportsDirectory>
@@ -539,7 +553,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
-				<version>3.3.2</version>
+				<version>3.2.0</version>
 				<configuration>
 					<quiet>true</quiet>
 					<failOnError>false</failOnError>
@@ -557,18 +571,16 @@
 				<artifactId>surefire-report-maven-plugin</artifactId>
 				<version>2.0-beta-1</version>
 			</plugin>
-			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>buildnumber-maven-plugin</artifactId> <executions> <execution>
-				<phase>initialize</phase> <goals> <goal>create</goal> </goals> </execution> </executions> <configuration> <doCheck>false</doCheck>
+			<!-- <plugin> <groupId>org.codehaus.mojo</groupId> <artifactId>buildnumber-maven-plugin</artifactId> <executions> <execution> 
+				<phase>initialize</phase> <goals> <goal>create</goal> </goals> </execution> </executions> <configuration> <doCheck>false</doCheck> 
 				<doUpdate>false</doUpdate> <timestampFormat>{0, date, yyyy-MM-dd HH:mm:ss}</timestampFormat> </configuration> </plugin> -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-antrun-plugin</artifactId>
-				<version>3.0.0</version>
 				<configuration>
 					<tasks>
 						<echo message="Unpacking bundle ${project.build.directory}/${project.artifactId}-${project.version}-generic-bundle.zip" />
-						<unzip src="${project.build.directory}/${project.artifactId}-${project.version}-generic-bundle.zip"
-							   dest="${project.build.directory}" />
+						<unzip src="${project.build.directory}/${project.artifactId}-${project.version}-generic-bundle.zip" dest="${project.build.directory}" />
 						<copy todir="${project.build.directory}/staging/lib">
 							<fileset dir="${project.build.directory}/${project.artifactId}-${project.version}/lib">
 								<include name="ermineJ.jar" />
@@ -602,8 +614,7 @@
 								<include name="**" />
 							</fileset>
 						</copy>
-						<copy file="${basedir}/src/main/izpack/LICENSE.txt"
-							  todir="${project.build.directory}/staging" />
+						<copy file="${basedir}/src/main/izpack/LICENSE.txt" todir="${project.build.directory}/staging" />
 						<copy file="${basedir}/src/main/izpack/README.txt" todir="${project.build.directory}/staging" />
 						<echo message="${project.version}" file="${basedir}/src/main/resources/ubic/erminej/version" />
 					</tasks>
@@ -622,26 +633,26 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-assembly-plugin</artifactId>
-				<version>3.3.0</version>
+				<version>2.2-beta-2</version>
 				<inherited>false</inherited>
 				<executions>
 					<execution>
 						<id>bin-assemble</id>
 						<phase>package</phase>
 						<goals>
-							<goal>single</goal>
+							<goal>assembly</goal>
 						</goals>
 						<configuration>
-							<descriptorRefs>
-								<descriptorRef>bin</descriptorRef>
-							</descriptorRefs>
+							<descriptors>
+								<descriptor>src/main/assembly/bin-assembly.xml</descriptor>
+							</descriptors>
 						</configuration>
 					</execution>
 					<execution>
 						<id>src-assemble</id>
 						<phase>package</phase>
 						<goals>
-							<goal>single</goal>
+							<goal>assembly</goal>
 						</goals>
 						<configuration>
 							<descriptorRefs>
@@ -696,11 +707,52 @@
 			<plugin>
 				<groupId>org.codehaus.izpack</groupId>
 				<artifactId>izpack-maven-plugin</artifactId>
-				<version>5.1.3</version>
+				<version>5.0.0-beta8</version>
 				<configuration>
-					<baseDir>${project.build.directory}/${project.artifactId}-${project.version}</baseDir>
+					<izpackBasedir>${project.build.directory}/${project.artifactId}-${project.version}</izpackBasedir>
 				</configuration>
 			</plugin>
 		</plugins>
+		<extensions>
+			<extension>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-ssh-external</artifactId>
+				<version>1.0-beta-6</version>
+			</extension>
+		</extensions>
 	</build>
+	<distributionManagement>
+		<repository>
+			<id>pavlabrepo</id>
+			<name>Pavlab</name>
+			<url>scpexe://willie.msl.ubc.ca/space/maven2</url>
+		</repository>
+	</distributionManagement>
+	<profiles>
+		<profile>
+			<!-- For deployment where host is local (and ssh isn't available for builder, e.g. CI) -->
+			<id>local-deploy</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+				<property>
+					<name>deploy.local</name>
+				</property>
+			</activation>
+			<distributionManagement>
+				<repository>
+					<id>repo</id>
+					<name>Pavlab</name>
+					<url>file:///space/maven2</url>
+				</repository>
+				<snapshotRepository>
+					<id>repo</id>
+					<name>Pavlab</name>
+					<url>file:///space/maven2</url>
+				</snapshotRepository>
+			</distributionManagement>
+		</profile>
+	</profiles>
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
 </project>

@@ -49,7 +49,7 @@ import ubic.erminej.Settings;
  *
  * @author Paul Pavlidis
  * @author Homin Lee
- * @see GeneAnnotations
+ * @see    GeneAnnotations
  * 
  */
 public class GeneSetTerms {
@@ -102,36 +102,40 @@ public class GeneSetTerms {
      * Constructor for GeneSetTerms.
      * </p>
      *
-     * @param i a {@link java.io.InputStream} object.
-     * @param oldFormat if old XML format.
-     * @param obo if obo format
-     * @throws org.xml.sax.SAXException if any.
+     * @param  i                   a {@link java.io.InputStream} object.
      * @throws java.io.IOException if any.
      */
-    public GeneSetTerms( InputStream i, boolean oldFormat, boolean obo ) throws SAXException, IOException {
-        this.initialize( i, oldFormat, obo );
+    public GeneSetTerms( InputStream i ) throws IOException {
+        this.initialize( i, false );
         i.close();
     }
 
     /**
+     * Only kept for compatibility with some tests that are annoying to rewrite, and which use the old XML-RDF format.
+     * 
+     * @param  i
+     * @param  oldrdf
+     * @throws IOException
+     */
+    public GeneSetTerms( InputStream i, boolean oldrdf ) throws IOException {
+        this.initialize( i, oldrdf );
+    }
+
+    /**
      * <p>
-     * Constructor for GeneSetTerms. File type is detected by the name. If it has ".obo." in the name we assume it is
-     * not XML.
+     * Constructor for GeneSetTerms. File type is detected by the name.
      * </p>
      *
-     * @param oldFormat set to true to indicate that the RDF is 'old style' (pre ~2008)
      * @throws java.io.IOException if any.
-     * @throws org.xml.sax.SAXException if any.
-     * @param fileName a {@link java.lang.String} object.
+     * @param  fileName            a {@link java.lang.String} object.
      */
-    public GeneSetTerms( String fileName, boolean oldFormat ) throws SAXException, IOException {
+    public GeneSetTerms( String fileName ) throws IOException {
         if ( fileName == null || fileName.length() == 0 ) {
             throw new IllegalArgumentException( "Invalid filename " + fileName + " or no filename was given" );
         }
 
         try (InputStream i = FileTools.getInputStreamFromPlainOrCompressedFile( fileName )) {
-            boolean obo = fileName.toLowerCase().matches( ".+?\\.obo\\..*" );
-            this.initialize( i, oldFormat, obo );
+            this.initialize( i, false );
         }
     }
 
@@ -141,12 +145,12 @@ public class GeneSetTerms {
      * </p>
      *
      * @throws org.xml.sax.SAXException if any.
-     * @throws java.io.IOException if any.
-     * @param fileName a {@link java.lang.String} object.
-     * @param settings a {@link ubic.erminej.Settings} object.
+     * @throws java.io.IOException      if any.
+     * @param  fileName                 a {@link java.lang.String} object.
+     * @param  settings                 a {@link ubic.erminej.Settings} object.
      */
-    public GeneSetTerms( String fileName, Settings settings ) throws SAXException, IOException {
-        this( fileName, false );
+    public GeneSetTerms( String fileName, Settings settings ) throws IOException {
+        this( fileName );
         // Ensure the settings are updated, if we are calling this with the bare API
         settings.setClassFile( new File( fileName ).getAbsolutePath() );
     }
@@ -156,8 +160,8 @@ public class GeneSetTerms {
      * getAllChildren.
      * </p>
      *
-     * @param term a {@link ubic.erminej.data.GeneSetTerm} object.
-     * @return a {@link java.util.Set} object.
+     * @param  term a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return      a {@link java.util.Set} object.
      */
     public Set<GeneSetTerm> getAllChildren( GeneSetTerm term ) {
         if ( getGraph() == null ) return null;
@@ -175,8 +179,8 @@ public class GeneSetTerms {
      * getAllParents.
      * </p>
      *
-     * @param id a {@link ubic.erminej.data.GeneSetTerm} object.
-     * @return all parents EXCEPT for obsolete terms, aspect and root.
+     * @param  id a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return    all parents EXCEPT for obsolete terms, aspect and root.
      */
     public Collection<GeneSetTerm> getAllParents( GeneSetTerm id ) {
         assert id != null;
@@ -201,32 +205,13 @@ public class GeneSetTerms {
         return returnVal;
     }
 
-    // /**
-    // * @param id
-    // * @return The length of the shortest path to the root
-    // */
-    // public int depth( GeneSetTerm id ) {
-    // Collection<GeneSetTerm> parents = getParents( id );
-    // return depth( id, parents, 0 );
-    // }
-    //
-    // /*
-    // * FIXME
-    // */
-    // private int depth( GeneSetTerm id, Collection<GeneSetTerm> parents, int i ) {
-    // for ( GeneSetTerm p : parents ) {
-    // depth( p, getParents( p ), i );
-    // }
-    // return i;
-    // }
-
     /**
      * <p>
      * getChildren.
      * </p>
      *
-     * @param id a {@link ubic.erminej.data.GeneSetTerm} object.
-     * @return a Set containing the ids of geneSets which are immediately below the selected one in the hierarchy.
+     * @param  id a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return    a Set containing the ids of geneSets which are immediately below the selected one in the hierarchy.
      */
     public Set<GeneSetTerm> getChildren( GeneSetTerm id ) {
         if ( getGraph() == null ) return null;
@@ -267,15 +252,13 @@ public class GeneSetTerms {
     }
 
     /**
-     * <p>
-     * getParents.
-     * </p>
-     *
-     * @param id GO id
-     * @return a Set containing the ids of geneSets which are immediately above the selected one in the hierarchy - but
-     *         excluding the aspect or the root. Thus if the parameter is an aspect, nothing will be returned.
+     * Get direct parent terms
+     * 
+     * @param  id         term id to get parents for
+     * @param  keepAspect whether to retain the aspect as a parent
+     * @return            ids of geneSets which are immediately above the selected one in the hierarchy
      */
-    public Collection<GeneSetTerm> getParents( GeneSetTerm id ) {
+    private Collection<GeneSetTerm> getParents( GeneSetTerm id, boolean keepAspect ) {
         assert id != null;
         if ( getGraph() == null ) return null;
         Collection<GeneSetTerm> returnVal = new HashSet<>();
@@ -286,16 +269,35 @@ public class GeneSetTerms {
         }
 
         Set<DirectedGraphNode<String, GeneSetTerm>> parents = getGraph().get( id.getId() ).getParentNodes();
+        if ( parents.isEmpty() ) {
+            log.debug( "No parents for " + id );
+        }
         for ( DirectedGraphNode<String, GeneSetTerm> parent : parents ) {
             if ( parent == null ) continue;
             GeneSetTerm goEntry = parent.getItem();
             if ( goEntry == null ) continue;
             if ( goEntry.getId().equals( "all" ) ) continue;
             if ( goEntry.getId().equals( "top" ) ) continue; // very old GO
-            if ( goEntry.isAspect() ) continue;
+            if ( goEntry.isAspect() && !keepAspect ) {
+                continue;
+            }
             returnVal.add( goEntry );
         }
         return returnVal;
+    }
+
+    /**
+     * <p>
+     * Get direct parent terms
+     * </p>
+     *
+     * @param  id GO id
+     * @return    ids of geneSets which are immediately above the selected one in the hierarchy -
+     *            but
+     *            excluding the aspect or the root. Thus if the parameter is an aspect, nothing will be returned.
+     */
+    public Collection<GeneSetTerm> getParents( GeneSetTerm id ) {
+        return getParents( id, false );
     }
 
     /**
@@ -329,8 +331,8 @@ public class GeneSetTerms {
      * isLeaf.
      * </p>
      *
-     * @param id a {@link ubic.erminej.data.GeneSetTerm} object.
-     * @return true if this term has no children
+     * @param  id a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return    true if this term has no children
      */
     public boolean isLeaf( GeneSetTerm id ) {
         return getChildren( id ).isEmpty();
@@ -341,9 +343,9 @@ public class GeneSetTerms {
      * isParent.
      * </p>
      *
-     * @param p a {@link ubic.erminej.data.GeneSetTerm} object.
-     * @param c a {@link ubic.erminej.data.GeneSetTerm} object.
-     * @return true if p is a parent of c (somewhere in the hierarchy.
+     * @param  p a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @param  c a {@link ubic.erminej.data.GeneSetTerm} object.
+     * @return   true if p is a parent of c (somewhere in the hierarchy.
      */
     public boolean isParent( GeneSetTerm p, GeneSetTerm c ) {
         return this.getAllParents( c ).contains( p );
@@ -373,8 +375,8 @@ public class GeneSetTerms {
     /**
      * Note that it is probably preferable to use findTerm from GeneAnnotations; this is used while setting that up.
      *
-     * @param geneSetId a {@link java.lang.String} object.
-     * @return GeneSetTerm
+     * @param  geneSetId a {@link java.lang.String} object.
+     * @return           GeneSetTerm
      */
     protected GeneSetTerm get( String geneSetId ) {
         DirectedGraphNode<String, GeneSetTerm> directedGraphNode = this.graph.getItems().get( geneSetId );
@@ -398,15 +400,21 @@ public class GeneSetTerms {
     }
 
     /***
-     * @param term
-     * @param goNames
+     * @param  term
+     * @param  goNames
      * @return
      */
     private String getAspect( GeneSetTerm term ) {
         if ( term.getAspect() != null ) return term.getAspect();
 
-        Collection<GeneSetTerm> parents = getParents( term );
+        if ( term.isAspect() ) {
+            return term.getName();
+        }
+
+        Collection<GeneSetTerm> parents = getParents( term, true );
         if ( parents.isEmpty() ) {
+
+            log.info( "no parents for " + term );
             return null;
         }
         for ( GeneSetTerm parent : parents ) {
@@ -419,21 +427,24 @@ public class GeneSetTerms {
     }
 
     /**
-     * @param inputStream
-     * @param oldFormat
-     * @param obo if this is OBO format (presumed 1.2) rather than XML
+     * @param  inputStream
+     * @param  boolean     oldrdf maintained only for compatibility of one test
      * @throws IOException
-     * @throws SAXException
      */
-    private void initialize( InputStream inputStream, boolean oldFormat, boolean obo ) throws IOException, SAXException {
-        GOParser parser;
+    private void initialize( InputStream inputStream, boolean oldrdf ) throws IOException {
+        GOParser parser = null;
 
-        if ( obo ) {
-            parser = new GOOBOParser( inputStream );
+        if ( oldrdf ) {
+            try {
+                // only kept for compatibility of some old tests that would be a pain to rewrite
+                parser = new GOXMLParser( inputStream );
+            } catch ( SAXException e ) {
+                throw new IllegalStateException( e );
+            }
         } else {
-            parser = new GOXMLParser( inputStream, oldFormat );
-
+            parser = new GOOBOParser( inputStream );
         }
+
         this.graph = parser.getGraph();
 
         assert graph != null;
@@ -456,6 +467,7 @@ public class GeneSetTerms {
                 String aspect = this.getAspect( geneSet );
                 if ( aspect == null && !geneSet.getDefinition().startsWith( "OBSOLETE" ) ) {
                     log.info( "Could not locate aspect for " + geneSet );
+                    continue;
                 }
                 geneSet.setAspect( aspect );
             }

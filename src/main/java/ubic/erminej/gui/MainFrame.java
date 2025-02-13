@@ -80,7 +80,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.StopWatch;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.xml.sax.SAXException;
 
 import ubic.basecode.util.BrowserLauncher;
 import ubic.basecode.util.FileTools;
@@ -931,9 +930,7 @@ public class MainFrame extends JFrame {
             return;
         }
 
-        try {
-
-            BufferedReader fis = new BufferedReader( new FileReader( logFile ) );
+        try ( BufferedReader fis = new BufferedReader( new FileReader( logFile ) )){         
             String line;
             while ( ( line = fis.readLine() ) != null ) {
                 bif.append( line );
@@ -1337,16 +1334,14 @@ public class MainFrame extends JFrame {
         timer.start();
         updateProgress( 10 );
 
-        statusMessenger.showProgress( "Reading GO hierarchy from: " + settings.getClassFile() );
         assert settings.getClassFile() != null;
+        
+        statusMessenger.showProgress( "Reading GO hierarchy from OBO file: " + settings.getClassFile() );
 
         GeneSetTerms goData = null;
         try {
             goData = new GeneSetTerms( settings.getClassFile(), settings );
-        } catch ( SAXException e ) {
-            GuiUtil.error( "Gene Ontology file format is incorrect. "
-                    + "\nPlease check that it is a valid GO XML file." );
-            return;
+      
         } catch ( IOException e ) {
             GuiUtil.error( "Error during GO initialization: " + e.getMessage() );
             return;

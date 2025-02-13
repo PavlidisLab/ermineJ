@@ -50,7 +50,7 @@ import ubic.gemma.model.expression.arrayDesign.ArrayDesignValueObject;
 /**
  * Assistance in getting gene annotation files.
  *
- * @author paul
+ * @author  paul
  * @version $Id$
  */
 public class AnnotationFileFetcher {
@@ -61,17 +61,18 @@ public class AnnotationFileFetcher {
      * Get the list of available annotations
      *
      * @throws java.io.IOException if any.
-     * @return a {@link java.util.List} object.
+     * @return                     a {@link java.util.List} object.
      */
     public List<ArrayDesignValueObject> fetchList() throws IOException {
         try {
             String url = Settings.ANNOTATION_FILE_LIST_RESTURL;
             assert url != null;
             URL toBeGotten = new URL( url );
-            InputStream is = toBeGotten.openStream();
-            JSONParser parser = new JSONParser( is );
-            JSONValue v = parser.nextValue();
-            return convert( v );
+            try (InputStream is = toBeGotten.openStream();) {
+                JSONParser parser = new JSONParser( is );
+                JSONValue v = parser.nextValue();
+                return convert( v );
+            }
         } catch ( RecognitionException e ) {
             throw new IOException( e );
         } catch ( TokenStreamException e ) {
@@ -98,8 +99,8 @@ public class AnnotationFileFetcher {
      * convert.
      * </p>
      *
-     * @param v a {@link com.sdicons.json.model.JSONValue} object.
-     * @return a {@link java.util.List} object.
+     * @param  v a {@link com.sdicons.json.model.JSONValue} object.
+     * @return   a {@link java.util.List} object.
      */
     protected List<ArrayDesignValueObject> convert( JSONValue v ) {
 

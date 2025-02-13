@@ -20,6 +20,7 @@ import static org.junit.Assert.assertTrue;
 import java.io.File;
 import java.io.InputStream;
 import java.util.Collection;
+import java.util.zip.GZIPInputStream;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +31,7 @@ import ubic.erminej.data.GeneAnnotationParser.Format;
 import ubic.erminej.data.UserDefinedGeneSetManager.GeneSetFileFormat;
 
 /**
- * @author paul
+ * @author  paul
  * @version $Id$
  */
 public class UserDefinedGeneSetManagerTest {
@@ -41,17 +42,17 @@ public class UserDefinedGeneSetManagerTest {
 
     @Before
     public void setUp() throws Exception {
+        try (InputStream ism = UserDefinedGeneSetManagerTest.class.getResourceAsStream( "/data/HG-U95A.an.txt" );
+                InputStream is = new GZIPInputStream( TestGOParser.class.getResourceAsStream( "/data/goslim_generic.obo.txt.gz" ) )) {
 
-        InputStream ism = UserDefinedGeneSetManagerTest.class.getResourceAsStream( "/data/HG-U95A.an.txt" );
-        InputStream is = this.getClass().getResourceAsStream( "/data/go_daily-termdb.rdf-sample2.xml" );
+            GeneSetTerms gonames = new GeneSetTerms( is );
+            GeneAnnotationParser p = new GeneAnnotationParser( gonames );
+            geneAnnots = p.read( ism, Format.DEFAULT, new Settings() );
 
-        GeneSetTerms gonames = new GeneSetTerms( is, false, false );
-        GeneAnnotationParser p = new GeneAnnotationParser( gonames );
-        geneAnnots = p.read( ism, Format.DEFAULT, new Settings() );
+            SettingsHolder settings = new Settings();
 
-        SettingsHolder settings = new Settings();
-
-        manager = new UserDefinedGeneSetManager( geneAnnots, settings, null );
+            manager = new UserDefinedGeneSetManager( geneAnnots, settings, null );
+        }
 
     }
 
